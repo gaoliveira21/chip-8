@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func main() {
 	cpu := new(CPU)
 
@@ -9,5 +7,5 @@ func main() {
 
 	cpu.LoadFont()
 
-	fmt.Printf("%d", cpu.memory)
+	cpu.Clock()
 }
