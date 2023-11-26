@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/gaoliveira21/chip8/memory"
 	"github.com/gaoliveira21/chip8/utils"
@@ -57,6 +59,18 @@ func NewCpu() CPU {
 	cpu.loadFont()
 
 	return cpu
+}
+
+func (cpu *CPU) LoadROM(rom string) {
+	romData, err := os.ReadFile("./roms/" + rom)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for index, b := range romData {
+		cpu.mmu.Write(uint16(index)+0x200, b)
+	}
 }
 
 func (cpu *CPU) Decode(data uint16) (oc *opcode) {

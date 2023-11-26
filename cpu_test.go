@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"slices"
 	"testing"
 
 	"github.com/gaoliveira21/chip8/utils"
@@ -60,6 +62,30 @@ func TestDecode(t *testing.T) {
 	expected = 0xBCD
 	if opcode.nnn != expected {
 		t.Errorf("opcode.n = 0x%X; expected 0x%X", opcode.nnn, expected)
+	}
+}
+
+func TestLoadROM(t *testing.T) {
+	originalROMData, err := os.ReadFile("./roms/IBM.ch8")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cpu := NewCpu()
+
+	cpu.LoadROM("IBM.ch8")
+
+	inMemoryROM := []byte{}
+
+	for i := 0; i < len(originalROMData); i++ {
+		romByte := cpu.mmu.Fetch(uint16(i + 0x200))
+
+		inMemoryROM = append(inMemoryROM, byte(romByte>>8))
+	}
+
+	if !slices.Equal[[]byte](inMemoryROM, originalROMData) {
+		t.Error("Error loading ROM")
 	}
 }
 
