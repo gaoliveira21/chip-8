@@ -44,12 +44,20 @@ type opcode struct {
 	nnn         uint16
 }
 
-func (cpu *CPU) LoadFont() {
-	fontIndex := 0
+func (cpu *CPU) loadFont() {
 	for i := 0x050; i <= 0x09F; i++ {
-		cpu.memory[i] = fontdata[fontIndex]
-		fontIndex++
+		cpu.memory[i] = fontdata[i-0x050]
 	}
+}
+
+func NewCpu() CPU {
+	cpu := CPU{
+		pc: 0x200,
+	}
+
+	cpu.loadFont()
+
+	return cpu
 }
 
 func (cpu *CPU) Fetch() uint16 {
