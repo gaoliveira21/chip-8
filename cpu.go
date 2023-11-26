@@ -60,7 +60,6 @@ func NewCpu() CPU {
 }
 
 func (cpu *CPU) Decode(data uint16) (oc *opcode) {
-
 	return &opcode{
 		instruction: data & INSTRUCTION_BITMASK,
 		registerX:   uint8((data & X_BITMASK) >> 8),
@@ -76,8 +75,6 @@ func (cpu *CPU) Clock() {
 	cpu.pc += 2
 
 	opcode := cpu.Decode(data)
-
-	fmt.Printf("%X", opcode)
 
 	switch opcode.instruction {
 	case 0x000:
