@@ -1,4 +1,4 @@
-package main
+package utils
 
 var Keypad = [...]byte{
 	0x01,

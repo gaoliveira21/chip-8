@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gaoliveira21/chip8/memory"
+	"github.com/gaoliveira21/chip8/utils"
 )
 
 const (
@@ -44,7 +45,7 @@ type opcode struct {
 
 func (cpu *CPU) loadFont() {
 	for i := 0x050; i <= 0x09F; i++ {
-		cpu.mmu.Write(uint16(i), fontdata[i-0x050])
+		cpu.mmu.Write(uint16(i), utils.Fontdata[i-0x050])
 	}
 }
 
