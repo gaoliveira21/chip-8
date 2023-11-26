@@ -62,3 +62,16 @@ func TestDecode(t *testing.T) {
 		t.Errorf("opcode.n = 0x%X; expected 0x%X", opcode.nnn, expected)
 	}
 }
+
+func TestClock(t *testing.T) {
+	cpu := NewCpu()
+
+	currentPc := cpu.pc
+
+	cpu.Clock()
+
+	expected := currentPc + 2
+	if cpu.pc != expected {
+		t.Errorf("cpu.pc = 0x%X; expected 0x%X", cpu.pc, expected)
+	}
+}
