@@ -3,12 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/gaoliveira21/chip8/utils"
+	"github.com/gaoliveira21/chip8/memory"
 )
 
 const (
-	RAM_SIZE  = 4096 // 4 KB
-	FREQUENCY = 700  // Instructions per second
+	FREQUENCY = 700 // Instructions per second
 
 	INSTRUCTION_BITMASK = 0xF000
 	X_BITMASK           = 0x0F00
@@ -25,11 +24,10 @@ const (
 )
 
 type CPU struct {
-	memory     [RAM_SIZE]uint8
 	pc         uint16   // Program Counter
 	i          uint16   // I Register
 	v          [16]byte // Variable registers
-	stack      utils.Stack
+	mmu        memory.MMU
 	display    [HEIGHT][WIDTH]byte
 	delayTimer uint8
 	soundTimer uint8
@@ -46,7 +44,7 @@ type opcode struct {
 
 func (cpu *CPU) loadFont() {
 	for i := 0x050; i <= 0x09F; i++ {
-		cpu.memory[i] = fontdata[i-0x050]
+		cpu.mmu.Write(uint16(i), fontdata[i-0x050])
 	}
 }
 
@@ -58,16 +56,6 @@ func NewCpu() CPU {
 	cpu.loadFont()
 
 	return cpu
-}
-
-func (cpu *CPU) Fetch() uint16 {
-	hb := uint16(cpu.memory[cpu.pc])
-	cpu.pc++
-
-	lb := uint16(cpu.memory[cpu.pc])
-	cpu.pc++
-
-	return (hb << 8) | lb
 }
 
 func (cpu *CPU) Decode(data uint16) (oc *opcode) {
@@ -83,7 +71,8 @@ func (cpu *CPU) Decode(data uint16) (oc *opcode) {
 }
 
 func (cpu *CPU) Clock() {
-	data := cpu.Fetch()
+	data := cpu.mmu.Fetch(cpu.pc)
+	cpu.pc += 2
 
 	opcode := cpu.Decode(data)
 

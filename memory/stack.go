@@ -1,4 +1,4 @@
-package utils
+package memory
 
 type Stack struct {
 	data [16]uint16
