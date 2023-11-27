@@ -101,3 +101,20 @@ func TestClock(t *testing.T) {
 		t.Errorf("cpu.pc = 0x%X; expected 0x%X", cpu.pc, expected)
 	}
 }
+
+func TestCLS(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.display[0][0] = 0xFF
+	cpu.display[0][1] = 0xEF
+
+	cpu.cls()
+
+	for i := 0; i < HEIGHT; i++ {
+		for j := 0; j < WIDTH; j++ {
+			if cpu.display[i][j] != 0x00 {
+				t.Errorf("cpu.display[%d][%d] = 0x%X; expected 0x00", i, j, cpu.display[i][j])
+			}
+		}
+	}
+}
