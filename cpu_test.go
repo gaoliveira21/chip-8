@@ -118,3 +118,15 @@ func TestCLS(t *testing.T) {
 		}
 	}
 }
+
+func TestJP(t *testing.T) {
+	cpu := NewCpu()
+
+	expected := 0xFFF
+
+	cpu.jp(uint16(expected))
+
+	if cpu.pc != uint16(expected) {
+		t.Errorf("cpu.pc = 0x%X; expected 0x%X", cpu.pc, expected)
+	}
+}
