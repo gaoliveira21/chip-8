@@ -130,3 +130,16 @@ func TestJP(t *testing.T) {
 		t.Errorf("cpu.pc = 0x%X; expected 0x%X", cpu.pc, expected)
 	}
 }
+
+func TestLD(t *testing.T) {
+	cpu := NewCpu()
+
+	var vIndex uint8 = 0x1
+	var expected uint8 = 0xFF
+
+	cpu.ld(vIndex, expected)
+
+	if cpu.v[vIndex] != expected {
+		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
+	}
+}
