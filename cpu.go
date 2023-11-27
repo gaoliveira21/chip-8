@@ -84,6 +84,18 @@ func (cpu *CPU) Decode(data uint16) (oc *opcode) {
 	}
 }
 
+func (cpu *CPU) Run() {
+	cpu.Clock()
+
+	if cpu.delayTimer > 0 {
+		cpu.delayTimer--
+	}
+
+	if cpu.soundTimer > 0 {
+		cpu.soundTimer--
+	}
+}
+
 func (cpu *CPU) Clock() {
 	data := cpu.mmu.Fetch(cpu.pc)
 	cpu.pc += 2
