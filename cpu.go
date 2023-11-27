@@ -106,6 +106,8 @@ func (cpu *CPU) Clock() {
 		}
 	case 0x1000:
 		cpu.jp(opcode.nnn)
+	case 0x6000:
+		cpu.ld(opcode.registerX, opcode.nn)
 	}
 }
 
@@ -119,4 +121,8 @@ func (cpu *CPU) cls() {
 
 func (cpu *CPU) jp(addr uint16) {
 	cpu.pc = addr
+}
+
+func (cpu *CPU) ld(vIndex uint8, b byte) {
+	cpu.v[vIndex] = b
 }
