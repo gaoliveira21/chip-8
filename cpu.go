@@ -92,16 +92,20 @@ func (cpu *CPU) Clock() {
 
 	switch opcode.instruction {
 	case 0x0000:
-		switch opcode.n {
-		case 0x0:
-			cpu.cls()
+		{
+			switch opcode.n {
+			case 0x0:
+				cpu.cls()
 
-		case 0xE:
-			fmt.Print("RET")
+			case 0xE:
+				fmt.Print("RET")
 
-		default:
-			fmt.Print("sys")
+			default:
+				fmt.Print("sys")
+			}
 		}
+	case 0x1000:
+		cpu.jp(opcode.nnn)
 	}
 }
 
@@ -111,4 +115,8 @@ func (cpu *CPU) cls() {
 			cpu.display[i][j] = 0x00
 		}
 	}
+}
+
+func (cpu *CPU) jp(addr uint16) {
+	cpu.pc = addr
 }
