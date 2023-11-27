@@ -158,3 +158,15 @@ func TestADD(t *testing.T) {
 		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
 	}
 }
+
+func TestLDI(t *testing.T) {
+	cpu := NewCpu()
+
+	var expected uint16 = 0x0ABC
+
+	cpu.ldi(expected)
+
+	if cpu.i != expected {
+		t.Errorf("cpu.i = 0x%X; expected 0x%X", cpu.i, expected)
+	}
+}
