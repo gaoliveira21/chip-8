@@ -91,16 +91,24 @@ func (cpu *CPU) Clock() {
 	opcode := cpu.Decode(data)
 
 	switch opcode.instruction {
-	case 0x000:
+	case 0x0000:
 		switch opcode.n {
-		case 0x00:
-			fmt.Print("CLS")
+		case 0x0:
+			cpu.cls()
 
-		case 0x0E:
+		case 0xE:
 			fmt.Print("RET")
 
 		default:
 			fmt.Print("sys")
+		}
+	}
+}
+
+func (cpu *CPU) cls() {
+	for i := 0; i < HEIGHT; i++ {
+		for j := 0; j < WIDTH; j++ {
+			cpu.display[i][j] = 0x00
 		}
 	}
 }
