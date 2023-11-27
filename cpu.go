@@ -110,6 +110,8 @@ func (cpu *CPU) Clock() {
 		cpu.ld(opcode.registerX, opcode.nn)
 	case 0x7000:
 		cpu.add(opcode.registerX, opcode.nn)
+	case 0xA000:
+		cpu.ldi(opcode.nnn)
 	}
 }
 
@@ -131,4 +133,8 @@ func (cpu *CPU) ld(vIndex uint8, b byte) {
 
 func (cpu *CPU) add(vIndex uint8, b byte) {
 	cpu.v[vIndex] += b
+}
+
+func (cpu *CPU) ldi(value uint16) {
+	cpu.i = value
 }
