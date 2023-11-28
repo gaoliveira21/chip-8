@@ -124,6 +124,8 @@ func (cpu *CPU) Clock() {
 		cpu.add(opcode.registerX, opcode.nn)
 	case 0xA000:
 		cpu.ldi(opcode.nnn)
+	case 0xD000:
+		cpu.drw(opcode)
 	}
 }
 
@@ -149,4 +151,37 @@ func (cpu *CPU) add(vIndex uint8, b byte) {
 
 func (cpu *CPU) ldi(value uint16) {
 	cpu.i = value
+}
+
+func (cpu *CPU) drw(oc *opcode) {
+	x := cpu.v[oc.registerX] & 0x3F
+	y := cpu.v[oc.registerY] & 0x1F
+	cpu.v[0xF] = 0x00
+
+	for i := 0; uint8(i) < oc.n; i++ {
+		addr := uint16(i) + cpu.i
+		pixels := byte(cpu.mmu.Fetch(addr) >> 8)
+
+		for j := 0; j < 8; j++ {
+			bit := (pixels >> (7 - j)) & 0x01
+
+			if bit == 0x01 && cpu.display[y][x] == 0x01 {
+				cpu.v[0xF] = 0x01
+			}
+
+			cpu.display[y][x] ^= bit
+
+			x++
+
+			if x >= WIDTH {
+				break
+			}
+		}
+
+		y++
+
+		if y >= HEIGHT {
+			break
+		}
+	}
 }
