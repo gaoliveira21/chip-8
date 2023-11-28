@@ -170,3 +170,39 @@ func TestLDI(t *testing.T) {
 		t.Errorf("cpu.i = 0x%X; expected 0x%X", cpu.i, expected)
 	}
 }
+
+func TestDRWNoWrapAndNoCollision(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0xD3)
+	cpu.mmu.Write(0x201, 0xD2)
+	cpu.i = 0x300
+	cpu.v[0x3] = 0
+	cpu.v[0xD] = 0
+	cpu.mmu.Write(0x300, 0x11)
+	cpu.mmu.Write(0x301, 0x88)
+
+	cpu.cls()
+
+	cpu.Clock()
+
+	if cpu.v[0xF] != 0x00 {
+		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x00", cpu.v[0xF])
+	}
+
+	if cpu.display[0][3] != 0x01 {
+		t.Errorf("cpu.display[0][3] = 0x%X; expected 0x01", cpu.display[0][3])
+	}
+
+	if cpu.display[0][7] != 0x01 {
+		t.Errorf("cpu.display[0][7] = 0x%X; expected 0x01", cpu.display[0][7])
+	}
+
+	if cpu.display[1][0] != 0x01 {
+		t.Errorf("cpu.display[1][0] = 0x%X; expected 0x01", cpu.display[1][0])
+	}
+
+	if cpu.display[1][4] != 0x01 {
+		t.Errorf("cpu.display[1][4] = 0x%X; expected 0x01", cpu.display[1][4])
+	}
+}
