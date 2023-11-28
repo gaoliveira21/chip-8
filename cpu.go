@@ -161,19 +161,20 @@ func (cpu *CPU) drw(oc *opcode) {
 	for i := 0; uint8(i) < oc.n; i++ {
 		addr := uint16(i) + cpu.i
 		pixels := byte(cpu.mmu.Fetch(addr) >> 8)
+		xIndex := x
 
 		for j := 0; j < 8; j++ {
 			bit := (pixels >> (7 - j)) & 0x01
 
-			if bit == 0x01 && cpu.display[y][x] == 0x01 {
+			if bit == 0x01 && cpu.display[y][xIndex] == 0x01 {
 				cpu.v[0xF] = 0x01
 			}
 
-			cpu.display[y][x] ^= bit
+			cpu.display[y][xIndex] ^= bit
 
-			x++
+			xIndex++
 
-			if x >= WIDTH {
+			if xIndex >= WIDTH {
 				break
 			}
 		}
