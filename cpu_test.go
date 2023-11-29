@@ -130,6 +130,24 @@ func TestRET(t *testing.T) {
 	}
 }
 
+func TestCALL(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.pc = 0x300
+	cpu.call(0x400)
+
+	stackPC := cpu.mmu.Stack.Pop()
+	currentPC := cpu.pc
+
+	if stackPC != 0x300 {
+		t.Errorf("Stack PC = 0x%X; expected 0x300", stackPC)
+	}
+
+	if currentPC != 0x400 {
+		t.Errorf("Current PC = 0x%X; expected 0x400", currentPC)
+	}
+}
+
 func TestJP(t *testing.T) {
 	cpu := NewCpu()
 
