@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -110,7 +109,7 @@ func (cpu *CPU) Clock() {
 				cpu.cls()
 
 			case 0x0EE:
-				fmt.Print("RET")
+				cpu.ret()
 
 			default:
 				cpu.jp(opcode.nnn)
@@ -135,6 +134,10 @@ func (cpu *CPU) cls() {
 			cpu.display[i][j] = 0x00
 		}
 	}
+}
+
+func (cpu *CPU) ret() {
+	cpu.pc = cpu.mmu.Stack.Pop()
 }
 
 func (cpu *CPU) jp(addr uint16) {
