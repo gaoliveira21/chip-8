@@ -119,6 +119,17 @@ func TestCLS(t *testing.T) {
 	}
 }
 
+func TestRET(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Stack.Push(0xDDEE)
+	cpu.ret()
+
+	if cpu.pc != 0xDDEE {
+		t.Errorf("cpu.pc = 0x%X; expected 0xDDEE", cpu.pc)
+	}
+}
+
 func TestJP(t *testing.T) {
 	cpu := NewCpu()
 
