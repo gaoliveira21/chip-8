@@ -119,6 +119,8 @@ func (cpu *CPU) Clock() {
 		cpu.jp(opcode.nnn)
 	case 0x2000:
 		cpu.call(opcode.nnn)
+	case 0x3000:
+		cpu.skp(cpu.v[opcode.registerX] == opcode.nn)
 	case 0x6000:
 		cpu.ld(opcode.registerX, opcode.nn)
 	case 0x7000:
@@ -149,6 +151,12 @@ func (cpu *CPU) jp(addr uint16) {
 func (cpu *CPU) call(addr uint16) {
 	cpu.mmu.Stack.Push(cpu.pc)
 	cpu.pc = addr
+}
+
+func (cpu *CPU) skp(condition bool) {
+	if condition {
+		cpu.pc += 2
+	}
 }
 
 func (cpu *CPU) ld(vIndex uint8, b byte) {
