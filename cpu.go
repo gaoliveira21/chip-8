@@ -121,10 +121,16 @@ func (cpu *CPU) Clock() {
 		cpu.call(opcode.nnn)
 	case 0x3000:
 		cpu.skp(cpu.v[opcode.registerX] == opcode.nn)
+	case 0x4000:
+		cpu.skp(cpu.v[opcode.registerX] != opcode.nn)
+	case 0x5000:
+		cpu.skp(cpu.v[opcode.registerX] == cpu.v[opcode.registerY])
 	case 0x6000:
 		cpu.ld(opcode.registerX, opcode.nn)
 	case 0x7000:
 		cpu.add(opcode.registerX, opcode.nn)
+	case 0x9000:
+		cpu.skp(cpu.v[opcode.registerX] != cpu.v[opcode.registerY])
 	case 0xA000:
 		cpu.ldi(opcode.nnn)
 	case 0xD000:
