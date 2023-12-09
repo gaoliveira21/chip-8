@@ -112,11 +112,11 @@ func (cpu *CPU) Clock() {
 				cpu.ret()
 
 			default:
-				cpu.jp(opcode.nnn)
+				cpu.jp(opcode.nnn, 0)
 			}
 		}
 	case 0x1000:
-		cpu.jp(opcode.nnn)
+		cpu.jp(opcode.nnn, 0)
 	case 0x2000:
 		cpu.call(opcode.nnn)
 	case 0x3000:
@@ -154,6 +154,8 @@ func (cpu *CPU) Clock() {
 		cpu.skp(cpu.v[opcode.registerX] != cpu.v[opcode.registerY])
 	case 0xA000:
 		cpu.ldi(opcode.nnn)
+	case 0xB000:
+		cpu.jp(opcode.nnn, cpu.v[0x0])
 	case 0xD000:
 		cpu.drw(opcode)
 	}
@@ -171,8 +173,8 @@ func (cpu *CPU) ret() {
 	cpu.pc = cpu.mmu.Stack.Pop()
 }
 
-func (cpu *CPU) jp(addr uint16) {
-	cpu.pc = addr
+func (cpu *CPU) jp(addr uint16, offset uint8) {
+	cpu.pc = addr + uint16(offset)
 }
 
 func (cpu *CPU) call(addr uint16) {
