@@ -105,17 +105,15 @@ func (cpu *CPU) Clock() {
 
 	switch opcode.instruction {
 	case 0x0000:
-		{
-			switch opcode.nnn {
-			case 0x0E0:
-				cpu.cls()
+		switch opcode.nnn {
+		case 0x0E0:
+			cpu.cls()
 
-			case 0x0EE:
-				cpu.ret()
+		case 0x0EE:
+			cpu.ret()
 
-			default:
-				cpu.jp(opcode.nnn, 0)
-			}
+		default:
+			cpu.jp(opcode.nnn, 0)
 		}
 	case 0x1000:
 		cpu.jp(opcode.nnn, 0)
