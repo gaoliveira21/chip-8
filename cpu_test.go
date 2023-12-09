@@ -150,12 +150,26 @@ func TestCALL(t *testing.T) {
 	}
 }
 
-func TestJP(t *testing.T) {
+func TestJPWithoutOffset(t *testing.T) {
 	cpu := NewCpu()
 
 	expected := 0xFFF
 
-	cpu.jp(uint16(expected))
+	cpu.jp(uint16(expected), 0)
+
+	if cpu.pc != uint16(expected) {
+		t.Errorf("cpu.pc = 0x%X; expected 0x%X", cpu.pc, expected)
+	}
+}
+
+func TestJPWithOffset(t *testing.T) {
+	cpu := NewCpu()
+	cpu.v[0x0] = 0x02
+
+	var addr uint16 = 0xFF0
+	expected := addr + uint16(cpu.v[0x0])
+
+	cpu.jp(uint16(addr), cpu.v[0x0])
 
 	if cpu.pc != uint16(expected) {
 		t.Errorf("cpu.pc = 0x%X; expected 0x%X", cpu.pc, expected)
