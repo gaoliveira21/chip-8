@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/gaoliveira21/chip8/memory"
 	"github.com/gaoliveira21/chip8/utils"
@@ -156,6 +158,8 @@ func (cpu *CPU) Clock() {
 		cpu.ldi(opcode.nnn)
 	case 0xB000:
 		cpu.jp(opcode.nnn, cpu.v[0x0])
+	case 0xC000:
+		cpu.rnd(opcode.registerX, opcode.nn)
 	case 0xD000:
 		cpu.drw(opcode)
 	}
@@ -243,6 +247,13 @@ func (cpu *CPU) shl(vIndex uint8) {
 	cpu.v[0xF] = (cpu.v[vIndex] & 0x80) >> 7
 
 	cpu.v[vIndex] <<= 1
+}
+
+func (cpu *CPU) rnd(vIndex uint8, b byte) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	randomByte := byte(r.Intn(256))
+
+	cpu.v[vIndex] = randomByte & b
 }
 
 func (cpu *CPU) drw(oc *opcode) {
