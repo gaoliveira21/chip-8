@@ -128,7 +128,28 @@ func (cpu *CPU) Clock() {
 	case 0x6000:
 		cpu.ld(opcode.registerX, opcode.nn)
 	case 0x7000:
-		cpu.add(opcode.registerX, opcode.nn)
+		cpu.add(opcode.registerX, opcode.nn, false)
+	case 0x8000:
+		switch opcode.n {
+		case 0x0:
+			cpu.ld(opcode.registerX, cpu.v[opcode.registerY])
+		case 0x1:
+			cpu.or(opcode.registerX, cpu.v[opcode.registerY])
+		case 0x2:
+			cpu.and(opcode.registerX, cpu.v[opcode.registerY])
+		case 0x3:
+			cpu.xor(opcode.registerX, cpu.v[opcode.registerY])
+		case 0x4:
+			cpu.add(opcode.registerX, cpu.v[opcode.registerY], true)
+		case 0x5:
+			cpu.sub(opcode.registerX, cpu.v[opcode.registerX], cpu.v[opcode.registerY])
+		case 0x6:
+			cpu.shr(opcode.registerX)
+		case 0x7:
+			cpu.sub(opcode.registerX, cpu.v[opcode.registerY], cpu.v[opcode.registerX])
+		case 0xE:
+			cpu.shl(opcode.registerX)
+		}
 	case 0x9000:
 		cpu.skp(cpu.v[opcode.registerX] != cpu.v[opcode.registerY])
 	case 0xA000:
@@ -169,12 +190,57 @@ func (cpu *CPU) ld(vIndex uint8, b byte) {
 	cpu.v[vIndex] = b
 }
 
-func (cpu *CPU) add(vIndex uint8, b byte) {
-	cpu.v[vIndex] += b
+func (cpu *CPU) add(vIndex uint8, b byte, carry bool) {
+	if carry {
+		cpu.v[0xF] = 0x0
+		result := uint16(cpu.v[vIndex]) + uint16(b)
+
+		if result > 255 {
+			cpu.v[0xF] = 0x1
+		}
+
+		cpu.v[vIndex] = byte(result)
+	} else {
+		cpu.v[vIndex] += b
+	}
+}
+
+func (cpu *CPU) sub(vIndex uint8, minuend byte, subtrahend byte) {
+	if minuend > subtrahend {
+		cpu.v[0xF] = 0x1
+	} else {
+		cpu.v[0xF] = 0x0
+	}
+
+	cpu.v[vIndex] = minuend - subtrahend
 }
 
 func (cpu *CPU) ldi(value uint16) {
 	cpu.i = value
+}
+
+func (cpu *CPU) or(vIndex uint8, b byte) {
+	cpu.v[vIndex] |= b
+}
+
+func (cpu *CPU) and(vIndex uint8, b byte) {
+	cpu.v[vIndex] &= b
+}
+
+func (cpu *CPU) xor(vIndex uint8, b byte) {
+	cpu.v[vIndex] ^= b
+}
+
+func (cpu *CPU) shr(vIndex uint8) {
+	cpu.v[0xF] = cpu.v[vIndex] & 0x01
+
+	cpu.v[vIndex] >>= 1
+}
+
+func (cpu *CPU) shl(vIndex uint8) {
+	cpu.v[0xF] = (cpu.v[vIndex] & 0x80) >> 7
+
+	cpu.v[vIndex] <<= 1
 }
 
 func (cpu *CPU) drw(oc *opcode) {
