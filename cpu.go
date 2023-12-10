@@ -180,6 +180,8 @@ func (cpu *CPU) Clock() {
 			cpu.ldk(opcode.registerX)
 		case 0x1E:
 			cpu.adi(uint16(cpu.v[opcode.registerX]))
+		case 0x29:
+			cpu.ldi(0x050 + 5*uint16(cpu.v[opcode.registerX]))
 		}
 	}
 }
