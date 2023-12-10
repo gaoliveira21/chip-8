@@ -184,6 +184,10 @@ func (cpu *CPU) Clock() {
 			cpu.ldi(0x050 + 5*uint16(cpu.v[opcode.registerX]))
 		case 0x33:
 			cpu.bcd(cpu.v[opcode.registerX])
+		case 0x55:
+			cpu.stm(opcode.registerX)
+		case 0x65:
+			cpu.ldm(opcode.registerX)
 		}
 	}
 }
@@ -309,6 +313,18 @@ func (cpu *CPU) adi(value uint16) {
 
 	if cpu.i > 0x0FFF {
 		cpu.v[0xF] = 0x1
+	}
+}
+
+func (cpu *CPU) stm(vIndex uint8) {
+	for i := 0; uint8(i) <= vIndex; i++ {
+		cpu.mmu.Write(cpu.i+uint16(i), cpu.v[i])
+	}
+}
+
+func (cpu *CPU) ldm(vIndex uint8) {
+	for i := 0; uint8(i) <= vIndex; i++ {
+		cpu.v[i] = byte(cpu.mmu.Fetch(cpu.i+uint16(i)) >> 8)
 	}
 }
 
