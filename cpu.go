@@ -178,6 +178,8 @@ func (cpu *CPU) Clock() {
 			cpu.lds(cpu.v[opcode.registerX])
 		case 0x0A:
 			cpu.ldk(opcode.registerX)
+		case 0x1E:
+			cpu.adi(uint16(cpu.v[opcode.registerX]))
 		}
 	}
 }
@@ -290,6 +292,14 @@ func (cpu *CPU) rnd(vIndex uint8, b byte) {
 	randomByte := byte(r.Intn(256))
 
 	cpu.v[vIndex] = randomByte & b
+}
+
+func (cpu *CPU) adi(value uint16) {
+	cpu.i += value
+
+	if cpu.i > 0x0FFF {
+		cpu.v[0xF] = 0x1
+	}
 }
 
 func (cpu *CPU) drw(oc *opcode) {
