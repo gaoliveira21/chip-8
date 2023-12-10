@@ -189,6 +189,43 @@ func TestLD(t *testing.T) {
 	}
 }
 
+func TestLDKWithNoKeyPressed(t *testing.T) {
+	cpu := NewCpu()
+	cpu.pc += 2
+
+	var vIndex uint8 = 0x1
+
+	cpu.ldk(vIndex)
+
+	if cpu.v[vIndex] != 0x0 {
+		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], 0x0)
+	}
+
+	if cpu.pc != 0x200 {
+		t.Errorf("cpu.pc = 0x%X; expected 0x200", cpu.pc)
+	}
+}
+
+func TestLDKWithKeyPressed(t *testing.T) {
+	cpu := NewCpu()
+	cpu.pc += 2
+
+	var vIndex uint8 = 0x1
+	var keyPressed uint8 = 0xF
+
+	cpu.Keys[keyPressed] = 0x1
+
+	cpu.ldk(vIndex)
+
+	if cpu.v[vIndex] != keyPressed {
+		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], keyPressed)
+	}
+
+	if cpu.pc != 0x202 {
+		t.Errorf("cpu.pc = 0x%X; expected 0x200", cpu.pc)
+	}
+}
+
 func TestADDWithoutCarry(t *testing.T) {
 	cpu := NewCpu()
 
