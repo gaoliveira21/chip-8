@@ -16,15 +16,17 @@ type Chip8 struct {
 }
 
 func (c8 *Chip8) Update() error {
-	for key, value := range utils.Keypad {
-		if ebiten.IsKeyPressed(key) {
-			c8.cpu.Keys[value] = 0x01
-		} else {
-			c8.cpu.Keys[value] = 0x00
+	for i := 0; i < int(FREQUENCY/60); i++ {
+		for key, value := range utils.Keypad {
+			if ebiten.IsKeyPressed(key) {
+				c8.cpu.Keys[value] = 0x01
+			} else {
+				c8.cpu.Keys[value] = 0x00
+			}
 		}
-	}
 
-	c8.cpu.Run()
+		c8.cpu.Run()
+	}
 
 	return nil
 }
@@ -62,7 +64,7 @@ func main() {
 	}
 
 	ebiten.SetWindowSize(c8.screenWidth, c8.screenHeight)
-	ebiten.SetWindowTitle("IBM.ch8")
+	ebiten.SetWindowTitle("PONG.ch8")
 
 	if err := ebiten.RunGame(c8); err != nil {
 		log.Fatal(err)
