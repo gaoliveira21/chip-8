@@ -320,6 +320,40 @@ func TestSUBWithCarry(t *testing.T) {
 	}
 }
 
+func TestADIWithoutOverflow(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.adi(0x80)
+	cpu.adi(0x50)
+
+	var expected uint16 = 0x80 + 0x50
+
+	if cpu.i != expected {
+		t.Errorf("cpu.i = 0x%X; expected 0x%X", cpu.i, expected)
+	}
+
+	if cpu.v[0xF] != 0x0 {
+		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x%X", cpu.v[0xF], 0x0)
+	}
+}
+
+func TestADIWithOverflow(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.adi(0x0FFF)
+	cpu.adi(0x01)
+
+	var expected uint16 = 0x0FFF + 0x01
+
+	if cpu.i != expected {
+		t.Errorf("cpu.i = 0x%X; expected 0x%X", cpu.i, expected)
+	}
+
+	if cpu.v[0xF] != 0x1 {
+		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x%X", cpu.v[0xF], 0x0)
+	}
+}
+
 func TestSHRWithoutFlag(t *testing.T) {
 	cpu := NewCpu()
 
