@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"os"
@@ -66,7 +66,7 @@ func TestDecode(t *testing.T) {
 }
 
 func TestLoadROM(t *testing.T) {
-	originalROMData, err := os.ReadFile("./roms/IBM.ch8")
+	originalROMData, err := os.ReadFile("../roms/IBM.ch8")
 
 	if err != nil {
 		t.Fatal(err)
@@ -74,7 +74,7 @@ func TestLoadROM(t *testing.T) {
 
 	cpu := NewCpu()
 
-	cpu.LoadROM("IBM.ch8")
+	cpu.LoadROM("../roms/IBM.ch8")
 
 	inMemoryROM := []byte{}
 
@@ -107,15 +107,15 @@ func TestClock(t *testing.T) {
 func TestCLS(t *testing.T) {
 	cpu := NewCpu()
 
-	cpu.display[0][0] = 0xFF
-	cpu.display[0][1] = 0xEF
+	cpu.Display[0][0] = 0xFF
+	cpu.Display[0][1] = 0xEF
 
 	cpu.cls()
 
 	for i := 0; i < HEIGHT; i++ {
 		for j := 0; j < WIDTH; j++ {
-			if cpu.display[i][j] != 0x00 {
-				t.Errorf("cpu.display[%d][%d] = 0x%X; expected 0x00", i, j, cpu.display[i][j])
+			if cpu.Display[i][j] != 0x00 {
+				t.Errorf("cpu.Display[%d][%d] = 0x%X; expected 0x00", i, j, cpu.Display[i][j])
 			}
 		}
 	}
@@ -479,20 +479,20 @@ func TestDRWNoWrapAndNoCollision(t *testing.T) {
 		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x00", cpu.v[0xF])
 	}
 
-	if cpu.display[0][3] != 0x01 {
-		t.Errorf("cpu.display[0][3] = 0x%X; expected 0x01", cpu.display[0][3])
+	if cpu.Display[0][3] != 0x01 {
+		t.Errorf("cpu.Display[0][3] = 0x%X; expected 0x01", cpu.Display[0][3])
 	}
 
-	if cpu.display[0][7] != 0x01 {
-		t.Errorf("cpu.display[0][7] = 0x%X; expected 0x01", cpu.display[0][7])
+	if cpu.Display[0][7] != 0x01 {
+		t.Errorf("cpu.Display[0][7] = 0x%X; expected 0x01", cpu.Display[0][7])
 	}
 
-	if cpu.display[1][0] != 0x01 {
-		t.Errorf("cpu.display[1][0] = 0x%X; expected 0x01", cpu.display[1][0])
+	if cpu.Display[1][0] != 0x01 {
+		t.Errorf("cpu.Display[1][0] = 0x%X; expected 0x01", cpu.Display[1][0])
 	}
 
-	if cpu.display[1][4] != 0x01 {
-		t.Errorf("cpu.display[1][4] = 0x%X; expected 0x01", cpu.display[1][4])
+	if cpu.Display[1][4] != 0x01 {
+		t.Errorf("cpu.Display[1][4] = 0x%X; expected 0x01", cpu.Display[1][4])
 	}
 }
 

@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"log"
@@ -32,7 +32,7 @@ type CPU struct {
 	i          uint16   // I Register
 	v          [16]byte // Variable registers
 	mmu        memory.MMU
-	display    [HEIGHT][WIDTH]byte
+	Display    [HEIGHT][WIDTH]byte
 	delayTimer uint8
 	soundTimer uint8
 	Keys       [16]uint8
@@ -63,8 +63,8 @@ func NewCpu() CPU {
 	return cpu
 }
 
-func (cpu *CPU) LoadROM(rom string) {
-	romData, err := os.ReadFile("./roms/" + rom)
+func (cpu *CPU) LoadROM(romPath string) {
+	romData, err := os.ReadFile(romPath)
 
 	if err != nil {
 		log.Fatal(err)
@@ -195,7 +195,7 @@ func (cpu *CPU) Clock() {
 func (cpu *CPU) cls() {
 	for i := 0; i < HEIGHT; i++ {
 		for j := 0; j < WIDTH; j++ {
-			cpu.display[i][j] = 0x00
+			cpu.Display[i][j] = 0x00
 		}
 	}
 }
@@ -341,11 +341,11 @@ func (cpu *CPU) drw(oc *opcode) {
 		for j := 0; j < 8; j++ {
 			bit := (pixels >> (7 - j)) & 0x01
 
-			if bit == 0x01 && cpu.display[y][xIndex] == 0x01 {
+			if bit == 0x01 && cpu.Display[y][xIndex] == 0x01 {
 				cpu.v[0xF] = 0x01
 			}
 
-			cpu.display[y][xIndex] ^= bit
+			cpu.Display[y][xIndex] ^= bit
 
 			xIndex++
 
