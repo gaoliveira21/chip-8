@@ -438,6 +438,28 @@ func TestLDI(t *testing.T) {
 	}
 }
 
+func TestBCD(t *testing.T) {
+	cpu := NewCpu()
+	cpu.i = 0x300
+
+	cpu.bcd(128)
+
+	v := uint8(cpu.mmu.Fetch(cpu.i) >> 8)
+	if v != 1 {
+		t.Errorf("value at memory addr = 0x%X; expected 0x%X", cpu.i, 1)
+	}
+
+	v = uint8(cpu.mmu.Fetch(cpu.i+1) >> 8)
+	if v != 2 {
+		t.Errorf("value at memory addr = 0x%X; expected 0x%X", cpu.i, 2)
+	}
+
+	v = uint8(cpu.mmu.Fetch(cpu.i+2) >> 8)
+	if v != 8 {
+		t.Errorf("value at memory addr = 0x%X; expected 0x%X", cpu.i, 8)
+	}
+}
+
 func TestDRWNoWrapAndNoCollision(t *testing.T) {
 	cpu := NewCpu()
 
