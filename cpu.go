@@ -170,6 +170,12 @@ func (cpu *CPU) Clock() {
 		}
 	case 0xF000:
 		switch opcode.nn {
+		case 0x07:
+			cpu.ld(opcode.registerX, cpu.delayTimer)
+		case 0x15:
+			cpu.ldt(cpu.v[opcode.registerX])
+		case 0x18:
+			cpu.lds(cpu.v[opcode.registerX])
 		case 0x0A:
 			cpu.ldk(opcode.registerX)
 		}
@@ -245,6 +251,14 @@ func (cpu *CPU) ldk(vIndex uint8) {
 	}
 
 	cpu.pc -= 2
+}
+
+func (cpu *CPU) ldt(value uint8) {
+	cpu.delayTimer = value
+}
+
+func (cpu *CPU) lds(value uint8) {
+	cpu.soundTimer = value
 }
 
 func (cpu *CPU) or(vIndex uint8, b byte) {
