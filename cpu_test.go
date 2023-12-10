@@ -189,6 +189,26 @@ func TestLD(t *testing.T) {
 	}
 }
 
+func TestLDT(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.ldt(0x60)
+
+	if cpu.delayTimer != 0x60 {
+		t.Errorf("cpu.delayTimer = 0x%X; expected 0x60", cpu.delayTimer)
+	}
+}
+
+func TestLDS(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.lds(0x80)
+
+	if cpu.soundTimer != 0x80 {
+		t.Errorf("cpu.soundTimer = 0x%X; expected 0x80", cpu.soundTimer)
+	}
+}
+
 func TestLDKWithNoKeyPressed(t *testing.T) {
 	cpu := NewCpu()
 	cpu.pc += 2
