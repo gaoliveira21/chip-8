@@ -4,6 +4,7 @@ import (
 	"image/color"
 	"log"
 
+	"github.com/gaoliveira21/chip8/utils"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -15,6 +16,14 @@ type Chip8 struct {
 }
 
 func (c8 *Chip8) Update() error {
+	for key, value := range utils.Keypad {
+		if ebiten.IsKeyPressed(key) {
+			c8.cpu.Keys[value] = 0x01
+		} else {
+			c8.cpu.Keys[value] = 0x00
+		}
+	}
+
 	c8.cpu.Run()
 
 	return nil
@@ -40,7 +49,7 @@ func (c8 *Chip8) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHei
 
 func main() {
 	cpu := NewCpu()
-	cpu.LoadROM("IBM.ch8")
+	cpu.LoadROM("PONG.ch8")
 
 	sqr := ebiten.NewImage(10, 10)
 	sqr.Fill(color.White)

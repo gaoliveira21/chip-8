@@ -35,6 +35,7 @@ type CPU struct {
 	display    [HEIGHT][WIDTH]byte
 	delayTimer uint8
 	soundTimer uint8
+	Keys       [16]uint8
 }
 
 type opcode struct {
@@ -160,6 +161,18 @@ func (cpu *CPU) Clock() {
 		cpu.rnd(opcode.registerX, opcode.nn)
 	case 0xD000:
 		cpu.drw(opcode)
+	case 0xE000:
+		switch opcode.nn {
+		case 0x9E:
+			cpu.skp(cpu.Keys[cpu.v[opcode.registerX]] == 0x01)
+		case 0xA1:
+			cpu.skp(cpu.Keys[cpu.v[opcode.registerX]] == 0x00)
+		}
+	case 0xF000:
+		switch opcode.nn {
+		case 0x0A:
+			cpu.ldk(opcode.registerX)
+		}
 	}
 }
 
@@ -221,6 +234,17 @@ func (cpu *CPU) sub(vIndex uint8, minuend byte, subtrahend byte) {
 
 func (cpu *CPU) ldi(value uint16) {
 	cpu.i = value
+}
+
+func (cpu *CPU) ldk(vIndex uint8) {
+	for i, v := range cpu.Keys {
+		if v == 0x01 {
+			cpu.v[vIndex] = uint8(i)
+			return
+		}
+	}
+
+	cpu.pc -= 2
 }
 
 func (cpu *CPU) or(vIndex uint8, b byte) {
