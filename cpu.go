@@ -182,6 +182,8 @@ func (cpu *CPU) Clock() {
 			cpu.adi(uint16(cpu.v[opcode.registerX]))
 		case 0x29:
 			cpu.ldi(0x050 + 5*uint16(cpu.v[opcode.registerX]))
+		case 0x33:
+			cpu.bcd(cpu.v[opcode.registerX])
 		}
 	}
 }
@@ -263,6 +265,12 @@ func (cpu *CPU) ldt(value uint8) {
 
 func (cpu *CPU) lds(value uint8) {
 	cpu.soundTimer = value
+}
+
+func (cpu *CPU) bcd(value uint8) {
+	cpu.mmu.Write(cpu.i, (value/100)%10)
+	cpu.mmu.Write(cpu.i+1, (value/10)%10)
+	cpu.mmu.Write(cpu.i+2, value%10)
 }
 
 func (cpu *CPU) or(vIndex uint8, b byte) {
