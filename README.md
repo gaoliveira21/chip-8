@@ -9,6 +9,7 @@
 - [ ] Add beep audio
 - [ ] Run in browser
 - [ ] Add configuration file to change color and keypad
+- [ ] Improve unit tests
 - [ ] Add SUPER-CHIP support
 - [ ] Add XO-CHIP support
 
