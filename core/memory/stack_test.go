@@ -3,7 +3,7 @@ package memory_test
 import (
 	"testing"
 
-	"github.com/gaoliveira21/chip8/memory"
+	"github.com/gaoliveira21/chip8/core/memory"
 )
 
 func TestStack(t *testing.T) {

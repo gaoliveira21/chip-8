@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/gaoliveira21/chip8/memory"
+	"github.com/gaoliveira21/chip8/core/memory"
 	"github.com/gaoliveira21/chip8/utils"
 )
 
