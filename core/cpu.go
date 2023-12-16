@@ -34,7 +34,7 @@ type CPU struct {
 	mmu        memory.MMU
 	Display    [HEIGHT][WIDTH]byte
 	delayTimer uint8
-	soundTimer uint8
+	SoundTimer uint8
 	Keys       [16]uint8
 }
 
@@ -93,8 +93,8 @@ func (cpu *CPU) Run() {
 		cpu.delayTimer--
 	}
 
-	if cpu.soundTimer > 0 {
-		cpu.soundTimer--
+	if cpu.SoundTimer > 0 {
+		cpu.SoundTimer--
 	}
 }
 
@@ -268,7 +268,7 @@ func (cpu *CPU) ldt(value uint8) {
 }
 
 func (cpu *CPU) lds(value uint8) {
-	cpu.soundTimer = value
+	cpu.SoundTimer = value
 }
 
 func (cpu *CPU) bcd(value uint8) {

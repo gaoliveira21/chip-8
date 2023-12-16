@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/gaoliveira21/chip8/core"
+	"github.com/gaoliveira21/chip8/core/audio"
 	"github.com/gaoliveira21/chip8/utils"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -12,6 +13,7 @@ import (
 type Chip8 struct {
 	cpu          *core.CPU
 	square       *ebiten.Image
+	audioPlayer  audio.AudioPlayer
 	screenWidth  int
 	screenHeight int
 }
@@ -27,6 +29,11 @@ func (c8 *Chip8) Update() error {
 		}
 
 		c8.cpu.Run()
+
+		if c8.cpu.SoundTimer > 0 {
+			c8.audioPlayer.Play()
+			c8.audioPlayer.Rewind()
+		}
 	}
 
 	return nil
@@ -57,9 +64,16 @@ func main() {
 	sqr := ebiten.NewImage(10, 10)
 	sqr.Fill(color.White)
 
+	p, err := audio.NewAudioPlayer("assets/beep.mp3")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	c8 := &Chip8{
 		square:       sqr,
 		cpu:          &cpu,
+		audioPlayer:  p,
 		screenWidth:  core.WIDTH * 10,
 		screenHeight: core.HEIGHT * 10,
 	}

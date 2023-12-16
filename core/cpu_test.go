@@ -204,8 +204,8 @@ func TestLDS(t *testing.T) {
 
 	cpu.lds(0x80)
 
-	if cpu.soundTimer != 0x80 {
-		t.Errorf("cpu.soundTimer = 0x%X; expected 0x80", cpu.soundTimer)
+	if cpu.SoundTimer != 0x80 {
+		t.Errorf("cpu.SoundTimer = 0x%X; expected 0x80", cpu.SoundTimer)
 	}
 }
 
