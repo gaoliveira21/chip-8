@@ -1,12 +1,14 @@
 # CHIP-8 Emulator (or Interpreter)
 
+A CHIP-8 Emulator project to put golang in practice and learn how emulators works.
+
 ![test_opcode](./assets/test_opcode.png)
 
 [corax89’s chip8-test-rom](https://github.com/corax89/chip8-test-rom)
 
 # To Do
 
-- [ ] Add beep audio
+- [X] Add beep audio
 - [ ] Run in browser
 - [ ] Add configuration file to change color and keypad
 - [ ] Improve unit tests
