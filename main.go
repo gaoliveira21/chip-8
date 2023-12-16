@@ -6,7 +6,6 @@ import (
 
 	"github.com/gaoliveira21/chip8/core"
 	"github.com/gaoliveira21/chip8/core/audio"
-	"github.com/gaoliveira21/chip8/utils"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -20,7 +19,7 @@ type Chip8 struct {
 
 func (c8 *Chip8) Update() error {
 	for i := 0; i < int(core.FREQUENCY/60); i++ {
-		for key, value := range utils.Keypad {
+		for key, value := range core.Keypad {
 			if ebiten.IsKeyPressed(key) {
 				c8.cpu.Keys[value] = 0x01
 			} else {

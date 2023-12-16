@@ -4,14 +4,12 @@ import (
 	"os"
 	"slices"
 	"testing"
-
-	"github.com/gaoliveira21/chip8/utils"
 )
 
 func TestNewCpu(t *testing.T) {
 	cpu := NewCpu()
 
-	inMemoryFonts := [len(utils.Fontdata)]byte{}
+	inMemoryFonts := [len(FontData)]byte{}
 
 	for i := 0x050; i <= 0x09F; i++ {
 		font := cpu.mmu.Fetch(uint16(i))
@@ -23,7 +21,7 @@ func TestNewCpu(t *testing.T) {
 		t.Errorf("cpu.pc = %d; expected 0x200", cpu.pc)
 	}
 
-	if inMemoryFonts != utils.Fontdata {
+	if inMemoryFonts != FontData {
 		t.Error("Error loading fonts")
 	}
 }
