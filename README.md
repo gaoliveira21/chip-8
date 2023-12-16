@@ -1,6 +1,6 @@
 # CHIP-8 Emulator (or Interpreter)
 
-A CHIP-8 Emulator project to put golang in practice and learn how emulators works.
+A CHIP-8 Emulator project to put GoLang in practice and learn how an emulator works.
 
 ![test_opcode](./assets/test_opcode.png)
 
