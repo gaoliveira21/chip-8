@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"image/color"
 	"log"
 
@@ -39,7 +40,7 @@ func (c8 *Chip8) Update() error {
 }
 
 func (c8 *Chip8) Draw(screen *ebiten.Image) {
-	screen.Fill(color.NRGBA{0x00, 0x00, 0x00, 0xff})
+	screen.Fill(color.NRGBA{23, 20, 33, 1})
 
 	for h := 0; h < core.HEIGHT; h++ {
 		for w := 0; w < core.WIDTH; w++ {
@@ -57,11 +58,14 @@ func (c8 *Chip8) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHei
 }
 
 func main() {
+	rom := flag.String("rom", "", "ROM path")
+	flag.Parse()
+
 	cpu := core.NewCpu()
-	cpu.LoadROM("./roms/PONG.ch8")
+	cpu.LoadROM(*rom)
 
 	sqr := ebiten.NewImage(10, 10)
-	sqr.Fill(color.White)
+	sqr.Fill(color.RGBA{51, 209, 122, 1})
 
 	p, err := audio.NewAudioPlayer("assets/beep.mp3")
 
@@ -78,7 +82,7 @@ func main() {
 	}
 
 	ebiten.SetWindowSize(c8.screenWidth, c8.screenHeight)
-	ebiten.SetWindowTitle("PONG.ch8")
+	ebiten.SetWindowTitle(*rom)
 
 	if err := ebiten.RunGame(c8); err != nil {
 		log.Fatal(err)
