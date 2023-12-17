@@ -1,0 +1,31 @@
+name: gh-pages-deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.x'
+
+      - name: Install dependencies
+        run: go get .
+
+      - name: Test with Go CLI
+        run: go test ./...
+
+      - name: Build WASM
+        run: GOOS=js GOARCH=wasm go build -o ./web/public/chip8.wasm ./web/web.go
+
+      - name: deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web/public
