@@ -28,7 +28,7 @@ func (c8 *Chip8) Update() error {
 
 		c8.cpu.Run()
 
-		if c8.cpu.SoundTimer > 0 {
+		if c8.cpu.SoundTimer > 0 && c8.audioPlayer != nil {
 			c8.audioPlayer.Play()
 			c8.audioPlayer.Rewind()
 		}
@@ -65,7 +65,7 @@ func RunChip8(rom []byte, title string) {
 	p, err := audio.NewAudioPlayer("assets/beep.mp3")
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 
 	c8 := &Chip8{
