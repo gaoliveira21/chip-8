@@ -6,10 +6,39 @@ A CHIP-8 Emulator project to put GoLang in practice and learn how an emulator wo
 
 [corax89’s chip8-test-rom](https://github.com/corax89/chip8-test-rom)
 
+# Demo
+
+Chip-8 browser demo available in the following link:
+
+[CHIP-8 emulator demo](https://gaoliveira21.github.io/chip-8/)
+
+# Keypad Configuration
+
+[Your keyboard] --> [Chip 8]
+
+1 --> 1
+2 --> 2
+3 --> 3
+4 --> C
+Q --> 4
+W --> 5
+E --> 6
+R --> D
+A --> 7
+S --> 8
+D --> 9
+F --> E
+Z --> A
+X --> 0
+C --> B
+V --> F
+
 # To Do
 
 - [X] Add beep audio
-- [ ] Run in browser
+- [X] Run in browser
+  - [ ] Audio support
+  - [ ] Select ROM
 - [ ] Add configuration file to change color and keypad
 - [ ] Improve unit tests
 - [ ] Add SUPER-CHIP support
