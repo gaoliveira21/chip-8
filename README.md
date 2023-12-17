@@ -16,22 +16,22 @@ Chip-8 browser demo available in the following link:
 
 [Your keyboard] --> [Chip 8]
 
-1 --> 1
-2 --> 2
-3 --> 3
-4 --> C
-Q --> 4
-W --> 5
-E --> 6
-R --> D
-A --> 7
-S --> 8
-D --> 9
-F --> E
-Z --> A
-X --> 0
-C --> B
-V --> F
+- 1 --> 1
+- 2 --> 2
+- 3 --> 3
+- 4 --> C
+- Q --> 4
+- W --> 5
+- E --> 6
+- R --> D
+- A --> 7
+- S --> 8
+- D --> 9
+- F --> E
+- Z --> A
+- X --> 0
+- C --> B
+- V --> F
 
 # To Do
 
