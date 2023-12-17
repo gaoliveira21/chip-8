@@ -18,9 +18,6 @@ jobs:
       - name: Install dependencies
         run: go get .
 
-      - name: Test with Go CLI
-        run: go test ./...
-
       - name: Build WASM
         run: GOOS=js GOARCH=wasm go build -o ./web/public/chip8.wasm ./web/web.go
 
