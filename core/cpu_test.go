@@ -64,7 +64,7 @@ func TestDecode(t *testing.T) {
 }
 
 func TestLoadROM(t *testing.T) {
-	originalROMData, err := os.ReadFile("../roms/IBM.ch8")
+	romData, err := os.ReadFile("../roms/IBM.ch8")
 
 	if err != nil {
 		t.Fatal(err)
@@ -72,17 +72,17 @@ func TestLoadROM(t *testing.T) {
 
 	cpu := NewCpu()
 
-	cpu.LoadROM("../roms/IBM.ch8")
+	cpu.LoadROM(romData)
 
 	inMemoryROM := []byte{}
 
-	for i := 0; i < len(originalROMData); i++ {
+	for i := 0; i < len(romData); i++ {
 		romByte := cpu.mmu.Fetch(uint16(i + 0x200))
 
 		inMemoryROM = append(inMemoryROM, byte(romByte>>8))
 	}
 
-	if !slices.Equal[[]byte](inMemoryROM, originalROMData) {
+	if !slices.Equal[[]byte](inMemoryROM, romData) {
 		t.Error("Error loading ROM")
 	}
 }

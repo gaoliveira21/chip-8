@@ -55,7 +55,7 @@ func (c8 *Chip8) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHei
 	return c8.screenWidth, c8.screenHeight
 }
 
-func RunChip8(rom string) {
+func RunChip8(rom []byte, title string) {
 	cpu := NewCpu()
 	cpu.LoadROM(rom)
 
@@ -77,7 +77,7 @@ func RunChip8(rom string) {
 	}
 
 	ebiten.SetWindowSize(c8.screenWidth, c8.screenHeight)
-	ebiten.SetWindowTitle(rom)
+	ebiten.SetWindowTitle(title)
 
 	if err := ebiten.RunGame(c8); err != nil {
 		log.Fatal(err)

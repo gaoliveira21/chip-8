@@ -1,9 +1,7 @@
 package core
 
 import (
-	"log"
 	"math/rand"
-	"os"
 	"time"
 
 	"github.com/gaoliveira21/chip8/core/memory"
@@ -62,14 +60,8 @@ func NewCpu() CPU {
 	return cpu
 }
 
-func (cpu *CPU) LoadROM(romPath string) {
-	romData, err := os.ReadFile(romPath)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for index, b := range romData {
+func (cpu *CPU) LoadROM(rom []byte) {
+	for index, b := range rom {
 		cpu.mmu.Write(uint16(index)+0x200, b)
 	}
 }
