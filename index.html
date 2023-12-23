@@ -8,6 +8,57 @@
 </head>
 
 <body>
+  <form id="select-rom">
+    <fieldset>
+      <legend>Select ROM</legend>
+
+      <div>
+        <input type="radio" id="pong" name="rom" value="PONG.ch8" checked />
+        <label for="PONG">Pong</label>
+        <details open>
+          <summary>Keyboard</summary>
+          <ul>
+            <li>↑ = <kbd>1</kbd></li>
+            <li>↓ = <kbd>Q</kbd></li>
+          </ul>
+        </details>
+      </div>
+
+      <div>
+        <input type="radio" id="snake" name="rom" value="SNAKE.ch8" />
+        <label for="snake">Snake [steveRoll]</label>
+        <details open>
+          <summary>Keyboard</summary>
+          <ul>
+            <li>↑ = <kbd>2</kbd></li>
+            <li>→ = <kbd>E</kbd></li>
+            <li>↓ = <kbd>S</kbd></li>
+            <li>← = <kbd>Q</kbd></li>
+            <li>Restart = <kbd>V</kbd></li>
+          </ul>
+        </details>
+      </div>
+
+      <div>
+        <input type="radio" id="space-invaders" name="rom" value="SPACE_INVADERS.ch8" />
+        <label for="space-invaders">Space Invaders [David Winter]</label>
+        <details open>
+          <summary>Keyboard</summary>
+          <ul>
+            <li>Shoot = <kbd>W</kbd></li>
+            <li>← = <kbd>Q</kbd></li>
+            <li>→ = <kbd>E</kbd></li>
+            <li>Start/Restart = <kbd>W</kbd></li>
+          </ul>
+        </details>
+      </div>
+    </fieldset>
+
+    <p>When running game press <kbd>ESC</kbd> to reload</p>
+
+    <button type="submit">Confirm</button>
+  </form>
+
   <script src="js/wasm_exec.js"></script>
   <script src="js/polyfill.js"></script>
   <script src="js/wasm_load.js"></script>
