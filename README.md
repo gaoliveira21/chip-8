@@ -38,7 +38,7 @@ Chip-8 browser demo available in the following link:
 - [X] Add beep audio
 - [X] Run in browser
   - [ ] Audio support
-  - [ ] Select ROM
+  - [X] Select ROM
 - [ ] Add configuration file to change color and keypad
 - [ ] Improve unit tests
 - [ ] Add SUPER-CHIP support
