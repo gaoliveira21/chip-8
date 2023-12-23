@@ -2,7 +2,7 @@
 
 A CHIP-8 Emulator project to put GoLang in practice and learn how an emulator works.
 
-![test_opcode](./assets/test_opcode.png)
+![test_opcode](./cli/assets/test_opcode.png)
 
 [corax89’s chip8-test-rom](https://github.com/corax89/chip8-test-rom)
 

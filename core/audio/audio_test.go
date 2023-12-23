@@ -7,7 +7,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	p, err := audio.NewAudioPlayer("../../assets/beep.mp3")
+	p, err := audio.NewAudioPlayer()
 
 	if p == nil {
 		t.Error(err)

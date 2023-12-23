@@ -4,6 +4,8 @@ import (
 	"errors"
 	"io"
 	"os"
+	"path"
+	"runtime"
 
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
@@ -13,8 +15,11 @@ const sampleRate = 48000
 
 type AudioPlayer = *audio.Player
 
-func readFromFS(mp3FilePath string) (io.Reader, error) {
-	r, err := os.Open(mp3FilePath)
+func readFromFS() (io.Reader, error) {
+	_, b, _, _ := runtime.Caller(0)
+	d := path.Join(path.Dir(b), "..", "..", "cli", "assets", "beep.mp3")
+
+	r, err := os.Open(d)
 
 	if err != nil {
 		return nil, err
@@ -23,7 +28,7 @@ func readFromFS(mp3FilePath string) (io.Reader, error) {
 	return r, nil
 }
 
-func NewAudioPlayer(mp3FilePath string) (AudioPlayer, error) {
+func NewAudioPlayer() (AudioPlayer, error) {
 	execMode := os.Getenv("EXEC_MODE")
 
 	var r io.Reader
@@ -33,7 +38,7 @@ func NewAudioPlayer(mp3FilePath string) (AudioPlayer, error) {
 		return nil, errors.New("audio unsuported on web")
 	}
 
-	r, err = readFromFS(mp3FilePath)
+	r, err = readFromFS()
 
 	if err != nil {
 		return nil, err

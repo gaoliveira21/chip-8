@@ -62,7 +62,7 @@ func RunChip8(rom []byte, title string) {
 	sqr := ebiten.NewImage(10, 10)
 	sqr.Fill(color.RGBA{51, 209, 122, 1})
 
-	p, err := audio.NewAudioPlayer("assets/beep.mp3")
+	p, err := audio.NewAudioPlayer()
 
 	if err != nil {
 		log.Print(err)
