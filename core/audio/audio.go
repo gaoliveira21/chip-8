@@ -1,8 +1,11 @@
 package audio
 
 import (
+	"bytes"
+	"io"
 	"os"
 
+	"github.com/gaoliveira21/chip8/core/http"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 )
@@ -11,9 +14,37 @@ const sampleRate = 48000
 
 type AudioPlayer = *audio.Player
 
-func NewAudioPlayer(mp3FilePath string) (AudioPlayer, error) {
-	audioContext := audio.NewContext(sampleRate)
+func readFromServer(mp3FilePath string) (io.Reader, error) {
+	b, err := http.ReadFile(mp3FilePath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return bytes.NewReader(b), nil
+}
+
+func readFromFS(mp3FilePath string) (io.Reader, error) {
 	r, err := os.Open(mp3FilePath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+func NewAudioPlayer(mp3FilePath string) (AudioPlayer, error) {
+	execMode := os.Getenv("EXEC_MODE")
+
+	var r io.Reader
+	var err error
+
+	if execMode == "web" {
+		r, err = readFromServer(mp3FilePath)
+	} else {
+		r, err = readFromFS(mp3FilePath)
+	}
 
 	if err != nil {
 		return nil, err
@@ -25,6 +56,7 @@ func NewAudioPlayer(mp3FilePath string) (AudioPlayer, error) {
 		return nil, err
 	}
 
+	audioContext := audio.NewContext(sampleRate)
 	p, err := audioContext.NewPlayer(stream)
 
 	if err != nil {
