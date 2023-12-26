@@ -64,7 +64,7 @@ func TestDecode(t *testing.T) {
 }
 
 func TestLoadROM(t *testing.T) {
-	romData, err := os.ReadFile("../roms/IBM.ch8")
+	romData, err := os.ReadFile("../cli/roms/IBM.ch8")
 
 	if err != nil {
 		t.Fatal(err)
@@ -87,28 +87,16 @@ func TestLoadROM(t *testing.T) {
 	}
 }
 
-func TestClock(t *testing.T) {
-	// TODO: Improve clock test with real memory addresses
-	t.Skip()
-	cpu := NewCpu()
-
-	currentPc := cpu.pc
-
-	cpu.Clock()
-
-	expected := currentPc + 2
-	if cpu.pc != expected {
-		t.Errorf("cpu.pc = 0x%X; expected 0x%X", cpu.pc, expected)
-	}
-}
-
 func TestCLS(t *testing.T) {
 	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x00)
+	cpu.mmu.Write(0x201, 0xE0)
 
 	cpu.Display[0][0] = 0xFF
 	cpu.Display[0][1] = 0xEF
 
-	cpu.cls()
+	cpu.Clock()
 
 	for i := 0; i < HEIGHT; i++ {
 		for j := 0; j < WIDTH; j++ {
@@ -122,24 +110,56 @@ func TestCLS(t *testing.T) {
 func TestRET(t *testing.T) {
 	cpu := NewCpu()
 
+	cpu.mmu.Write(0x200, 0x00)
+	cpu.mmu.Write(0x201, 0xEE)
+
 	cpu.mmu.Stack.Push(0xDDEE)
-	cpu.ret()
+	cpu.Clock()
 
 	if cpu.pc != 0xDDEE {
 		t.Errorf("cpu.pc = 0x%X; expected 0xDDEE", cpu.pc)
 	}
 }
 
+func TestJP0x0000(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x01)
+	cpu.mmu.Write(0x201, 0x11)
+
+	cpu.Clock()
+
+	if cpu.pc != 0x0111 {
+		t.Errorf("cpu.pc = 0x%X; expected 0x0111", cpu.pc)
+	}
+}
+
+func TestJP0x1000(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x12)
+	cpu.mmu.Write(0x201, 0x34)
+
+	cpu.Clock()
+
+	if cpu.pc != 0x0234 {
+		t.Errorf("cpu.pc = 0x%X; expected 0x0111", cpu.pc)
+	}
+}
+
 func TestCALL(t *testing.T) {
 	cpu := NewCpu()
 
+	cpu.mmu.Write(0x300, 0x24)
+	cpu.mmu.Write(0x301, 0x00)
+
 	cpu.pc = 0x300
-	cpu.call(0x400)
+	cpu.Clock()
 
 	stackPC := cpu.mmu.Stack.Pop()
 	currentPC := cpu.pc
 
-	if stackPC != 0x300 {
+	if stackPC != 0x302 {
 		t.Errorf("Stack PC = 0x%X; expected 0x300", stackPC)
 	}
 
@@ -148,42 +168,284 @@ func TestCALL(t *testing.T) {
 	}
 }
 
-func TestJPWithoutOffset(t *testing.T) {
-	cpu := NewCpu()
-
-	expected := 0xFFF
-
-	cpu.jp(uint16(expected), 0)
-
-	if cpu.pc != uint16(expected) {
-		t.Errorf("cpu.pc = 0x%X; expected 0x%X", cpu.pc, expected)
-	}
-}
-
 func TestJPWithOffset(t *testing.T) {
 	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0xBF)
+	cpu.mmu.Write(0x201, 0xF0)
+
 	cpu.v[0x0] = 0x02
 
-	var addr uint16 = 0xFF0
-	expected := addr + uint16(cpu.v[0x0])
+	expected := 0xFF0 + uint16(cpu.v[0x0])
 
-	cpu.jp(uint16(addr), cpu.v[0x0])
+	cpu.Clock()
 
 	if cpu.pc != uint16(expected) {
 		t.Errorf("cpu.pc = 0x%X; expected 0x%X", cpu.pc, expected)
 	}
 }
 
-func TestLD(t *testing.T) {
+func TestSKPVxEqualsToNN(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x35)
+	cpu.mmu.Write(0x201, 0x68)
+
+	cpu.v[0x5] = 0x68
+
+	cpu.Clock()
+
+	if cpu.pc != 0x204 {
+		t.Errorf("cpu.pc = 0x%X; expected 0x204", cpu.pc)
+	}
+
+	cpu.mmu.Write(0x204, 0x35)
+	cpu.mmu.Write(0x205, 0x70)
+
+	cpu.Clock()
+
+	if cpu.pc != 0x206 {
+		t.Errorf("cpu.pc = 0x%X; expected 0x206", cpu.pc)
+	}
+}
+
+func TestSKPVxNotEqualToNN(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x45)
+	cpu.mmu.Write(0x201, 0x70)
+
+	cpu.v[0x5] = 0x68
+
+	cpu.Clock()
+
+	if cpu.pc != 0x204 {
+		t.Errorf("cpu.pc = 0x%X; expected 0x204", cpu.pc)
+	}
+
+	cpu.mmu.Write(0x204, 0x45)
+	cpu.mmu.Write(0x205, 0x68)
+
+	cpu.Clock()
+
+	if cpu.pc != 0x206 {
+		t.Errorf("cpu.pc = 0x%X; expected 0x206", cpu.pc)
+	}
+}
+
+func TestSKPVxEqualsToVy(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x55)
+	cpu.mmu.Write(0x201, 0x60)
+
+	cpu.v[0x5] = 0x68
+	cpu.v[0x6] = 0x68
+
+	cpu.Clock()
+
+	if cpu.pc != 0x204 {
+		t.Errorf("cpu.pc = 0x%X; expected 0x204", cpu.pc)
+	}
+
+	cpu.mmu.Write(0x204, 0x55)
+	cpu.mmu.Write(0x205, 0x60)
+
+	cpu.v[0x5] = 0x70
+	cpu.v[0x6] = 0x71
+
+	cpu.Clock()
+
+	if cpu.pc != 0x206 {
+		t.Errorf("cpu.pc = 0x%X; expected 0x206", cpu.pc)
+	}
+}
+
+func TestLDNNToVx(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x61)
+	cpu.mmu.Write(0x201, 0xFF)
+
+	cpu.Clock()
+
+	if cpu.v[0x1] != 0xFF {
+		t.Errorf("cpu.v[0x1] = 0x%X; expected 0x%X", cpu.v[0x1], 0xFF)
+	}
+}
+
+func TestLDVyToVx(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x81)
+	cpu.mmu.Write(0x201, 0x20)
+
+	cpu.v[0x2] = 0x60
+
+	cpu.Clock()
+
+	if cpu.v[0x1] != 0x60 {
+		t.Errorf("cpu.v[0x1] = 0x%X; expected 0x%X", cpu.v[0x1], 0x60)
+	}
+}
+
+func TestADD(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x71)
+	cpu.mmu.Write(0x201, 0x03)
+
+	var vIndex uint8 = 0x1
+
+	cpu.v[vIndex] = 0x02
+
+	cpu.Clock()
+
+	expected := 0x05
+
+	if cpu.v[vIndex] != byte(expected) {
+		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
+	}
+}
+
+func TestADDWitoutCarry(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x81)
+	cpu.mmu.Write(0x201, 0x24)
+
+	var vIndex uint8 = 0x1
+	var yIndex uint8 = 0x2
+
+	cpu.v[vIndex] = 0x02
+	cpu.v[yIndex] = 0x03
+
+	cpu.Clock()
+
+	expected := 0x05
+
+	if cpu.v[vIndex] != byte(expected) {
+		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
+	}
+
+	if cpu.v[0xF] != 0x0 {
+		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x%X", cpu.v[0xF], 0x0)
+	}
+}
+
+func TestADDWithCarry(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x81)
+	cpu.mmu.Write(0x201, 0x24)
+
+	var vIndex uint8 = 0x1
+	var yIndex uint8 = 0x2
+
+	cpu.v[vIndex] = 0xEE
+	cpu.v[yIndex] = 0xEE
+
+	cpu.Clock()
+
+	expected := 0xEE + 0xEE
+
+	if cpu.v[vIndex] != byte(expected) {
+		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
+	}
+
+	if cpu.v[0xF] != 0x1 {
+		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x%X", cpu.v[0xF], 0x1)
+	}
+}
+
+func TestVxORVy(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x81)
+	cpu.mmu.Write(0x201, 0x21)
+
+	cpu.v[0x1] = 0x05
+	cpu.v[0x2] = 0x10
+
+	expected := byte(0x05 | 0x10)
+
+	cpu.Clock()
+
+	if cpu.v[0x1] != expected {
+		t.Errorf("cpu.v[0x1] = 0x%X; expected 0x%X", cpu.v[0x1], expected)
+	}
+}
+
+func TestVxANDVy(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x81)
+	cpu.mmu.Write(0x201, 0x22)
+
+	cpu.v[0x1] = 0x05
+	cpu.v[0x2] = 0x10
+
+	expected := byte(0x05 & 0x10)
+
+	cpu.Clock()
+
+	if cpu.v[0x1] != expected {
+		t.Errorf("cpu.v[0x1] = 0x%X; expected 0x%X", cpu.v[0x1], expected)
+	}
+}
+
+func TestVxXORVy(t *testing.T) {
+	cpu := NewCpu()
+
+	cpu.mmu.Write(0x200, 0x81)
+	cpu.mmu.Write(0x201, 0x23)
+
+	cpu.v[0x1] = 0x05
+	cpu.v[0x2] = 0x10
+
+	expected := byte(0x05 ^ 0x10)
+
+	cpu.Clock()
+
+	if cpu.v[0x1] != expected {
+		t.Errorf("cpu.v[0x1] = 0x%X; expected 0x%X", cpu.v[0x1], expected)
+	}
+}
+
+// TODO: Implement with real memory addresses
+func TestSUBWithoutCarry(t *testing.T) {
 	cpu := NewCpu()
 
 	var vIndex uint8 = 0x1
-	var expected uint8 = 0xFF
 
-	cpu.ld(vIndex, expected)
+	cpu.sub(vIndex, 0x02, 0x03)
 
-	if cpu.v[vIndex] != expected {
+	expected := 0x02 - 0x03
+
+	if cpu.v[vIndex] != byte(expected) {
 		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
+	}
+
+	if cpu.v[0xF] != 0x0 {
+		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x%X", cpu.v[0xF], 0x0)
+	}
+}
+
+func TestSUBWithCarry(t *testing.T) {
+	cpu := NewCpu()
+
+	var vIndex uint8 = 0x1
+
+	cpu.sub(vIndex, 0x03, 0x02)
+
+	expected := 0x03 - 0x02
+
+	if cpu.v[vIndex] != byte(expected) {
+		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
+	}
+
+	if cpu.v[0xF] != 0x1 {
+		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x%X", cpu.v[0xF], 0x1)
 	}
 }
 
@@ -241,80 +503,6 @@ func TestLDKWithKeyPressed(t *testing.T) {
 
 	if cpu.pc != 0x202 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x200", cpu.pc)
-	}
-}
-
-func TestADDWithoutCarry(t *testing.T) {
-	cpu := NewCpu()
-
-	var vIndex uint8 = 0x1
-
-	cpu.add(vIndex, 0x02, false)
-	cpu.add(vIndex, 0x03, false)
-
-	expected := 0x05
-
-	if cpu.v[vIndex] != byte(expected) {
-		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
-	}
-
-	if cpu.v[0xF] != 0x0 {
-		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x%X", cpu.v[0xF], 0x0)
-	}
-}
-
-func TestADDWithCarry(t *testing.T) {
-	cpu := NewCpu()
-
-	var vIndex uint8 = 0x1
-	cpu.v[vIndex] = 0xEE
-
-	cpu.add(vIndex, 0xEE, true)
-
-	expected := 0xEE + 0xEE
-
-	if cpu.v[vIndex] != byte(expected) {
-		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
-	}
-
-	if cpu.v[0xF] != 0x1 {
-		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x%X", cpu.v[0xF], 0x1)
-	}
-}
-
-func TestSUBWithoutCarry(t *testing.T) {
-	cpu := NewCpu()
-
-	var vIndex uint8 = 0x1
-
-	cpu.sub(vIndex, 0x02, 0x03)
-
-	expected := 0x02 - 0x03
-
-	if cpu.v[vIndex] != byte(expected) {
-		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
-	}
-
-	if cpu.v[0xF] != 0x0 {
-		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x%X", cpu.v[0xF], 0x0)
-	}
-}
-
-func TestSUBWithCarry(t *testing.T) {
-	cpu := NewCpu()
-
-	var vIndex uint8 = 0x1
-
-	cpu.sub(vIndex, 0x03, 0x02)
-
-	expected := 0x03 - 0x02
-
-	if cpu.v[vIndex] != byte(expected) {
-		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
-	}
-
-	if cpu.v[0xF] != 0x1 {
-		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x%X", cpu.v[0xF], 0x1)
 	}
 }
 
@@ -491,21 +679,5 @@ func TestDRWNoWrapAndNoCollision(t *testing.T) {
 
 	if cpu.Display[1][4] != 0x01 {
 		t.Errorf("cpu.Display[1][4] = 0x%X; expected 0x01", cpu.Display[1][4])
-	}
-}
-
-func TestSKP(t *testing.T) {
-	cpu := NewCpu()
-
-	cpu.skp(false)
-
-	if cpu.pc != 0x200 {
-		t.Errorf("cpu.pc = 0x%X; expected 0x200", cpu.pc)
-	}
-
-	cpu.skp(true)
-
-	if cpu.pc != 0x202 {
-		t.Errorf("cpu.pc = 0x%X; expected 0x202", cpu.pc)
 	}
 }
