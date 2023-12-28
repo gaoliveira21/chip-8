@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gaoliveira21/chip8/core/font"
+	"github.com/gaoliveira21/chip8/core/graphics"
 	"github.com/gaoliveira21/chip8/core/memory"
 )
 
@@ -19,18 +20,12 @@ const (
 	NNN_BITMASK         = 0x0FFF
 )
 
-// Display
-const (
-	WIDTH  = 0x40
-	HEIGHT = 0x20
-)
-
 type CPU struct {
 	pc         uint16   // Program Counter
 	i          uint16   // I Register
 	v          [16]byte // Variable registers
 	mmu        memory.MMU
-	Display    [HEIGHT][WIDTH]byte
+	Graphics   *graphics.Graphics
 	delayTimer uint8
 	SoundTimer uint8
 	Keys       [16]uint8
@@ -38,7 +33,8 @@ type CPU struct {
 
 func NewCpu() CPU {
 	cpu := CPU{
-		pc: 0x200,
+		pc:       0x200,
+		Graphics: graphics.NewGraphics(),
 	}
 
 	cpu.loadFont()
@@ -169,11 +165,7 @@ func (cpu *CPU) clock() {
 }
 
 func (cpu *CPU) cls() {
-	for i := 0; i < HEIGHT; i++ {
-		for j := 0; j < WIDTH; j++ {
-			cpu.Display[i][j] = 0x00
-		}
-	}
+	cpu.Graphics.Clear()
 }
 
 func (cpu *CPU) ret() {
@@ -316,23 +308,24 @@ func (cpu *CPU) drw(oc *opcode) {
 
 		for j := 0; j < 8; j++ {
 			bit := (pixels >> (7 - j)) & 0x01
+			pixelOnDisplay := cpu.Graphics.GetPixel(int(y), int(xIndex))
 
-			if bit == 0x01 && cpu.Display[y][xIndex] == 0x01 {
+			if bit == 0x01 && pixelOnDisplay == 0x01 {
 				cpu.v[0xF] = 0x01
 			}
 
-			cpu.Display[y][xIndex] ^= bit
+			cpu.Graphics.SetPixel(int(y), int(xIndex), pixelOnDisplay^bit)
 
 			xIndex++
 
-			if xIndex >= WIDTH {
+			if int(xIndex) >= cpu.Graphics.Width {
 				break
 			}
 		}
 
 		y++
 
-		if y >= HEIGHT {
+		if int(y) >= cpu.Graphics.Height {
 			break
 		}
 	}

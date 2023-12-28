@@ -58,15 +58,15 @@ func TestCLS(t *testing.T) {
 	cpu.mmu.Write(0x200, 0x00)
 	cpu.mmu.Write(0x201, 0xE0)
 
-	cpu.Display[0][0] = 0xFF
-	cpu.Display[0][1] = 0xEF
+	cpu.Graphics.SetPixel(0, 0, 0xFF)
+	cpu.Graphics.SetPixel(0, 1, 0xEF)
 
 	cpu.clock()
 
-	for i := 0; i < HEIGHT; i++ {
-		for j := 0; j < WIDTH; j++ {
-			if cpu.Display[i][j] != 0x00 {
-				t.Errorf("cpu.Display[%d][%d] = 0x%X; expected 0x00", i, j, cpu.Display[i][j])
+	for i := 0; i < cpu.Graphics.Height; i++ {
+		for j := 0; j < cpu.Graphics.Width; j++ {
+			if cpu.Graphics.GetPixel(i, j) != 0x00 {
+				t.Errorf("cpu.Display[%d][%d] = 0x%X; expected 0x00", i, j, cpu.Graphics.GetPixel(i, j))
 			}
 		}
 	}
@@ -687,19 +687,19 @@ func TestDRWNoWrapAndNoCollision(t *testing.T) {
 		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x00", cpu.v[0xF])
 	}
 
-	if cpu.Display[0][3] != 0x01 {
-		t.Errorf("cpu.Display[0][3] = 0x%X; expected 0x01", cpu.Display[0][3])
+	if cpu.Graphics.GetPixel(0, 3) != 0x01 {
+		t.Errorf("cpu.Graphics.GetPixel(0,3) = 0x%X; expected 0x01", cpu.Graphics.GetPixel(0, 3))
 	}
 
-	if cpu.Display[0][7] != 0x01 {
-		t.Errorf("cpu.Display[0][7] = 0x%X; expected 0x01", cpu.Display[0][7])
+	if cpu.Graphics.GetPixel(0, 7) != 0x01 {
+		t.Errorf("cpu.Graphics.GetPixel(0,7) = 0x%X; expected 0x01", cpu.Graphics.GetPixel(0, 7))
 	}
 
-	if cpu.Display[1][0] != 0x01 {
-		t.Errorf("cpu.Display[1][0] = 0x%X; expected 0x01", cpu.Display[1][0])
+	if cpu.Graphics.GetPixel(1, 0) != 0x01 {
+		t.Errorf("cpu.Graphics.GetPixel(1,0) = 0x%X; expected 0x01", cpu.Graphics.GetPixel(1, 0))
 	}
 
-	if cpu.Display[1][4] != 0x01 {
-		t.Errorf("cpu.Display[1][4] = 0x%X; expected 0x01", cpu.Display[1][4])
+	if cpu.Graphics.GetPixel(1, 4) != 0x01 {
+		t.Errorf("cpu.Graphics.GetPixel(1,4) = 0x%X; expected 0x01", cpu.Graphics.GetPixel(1, 4))
 	}
 }
