@@ -5,11 +5,13 @@ import (
 	"log"
 
 	"github.com/gaoliveira21/chip8/core/audio"
+	"github.com/gaoliveira21/chip8/core/cpu"
+	"github.com/gaoliveira21/chip8/core/input"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Chip8 struct {
-	cpu          *CPU
+	cpu          *cpu.CPU
 	square       *ebiten.Image
 	audioPlayer  audio.AudioPlayer
 	screenWidth  int
@@ -17,8 +19,8 @@ type Chip8 struct {
 }
 
 func (c8 *Chip8) Update() error {
-	for i := 0; i < int(FREQUENCY/60); i++ {
-		for key, value := range Keypad {
+	for i := 0; i < int(cpu.FREQUENCY/60); i++ {
+		for key, value := range input.Keypad {
 			if ebiten.IsKeyPressed(key) {
 				c8.cpu.Keys[value] = 0x01
 			} else {
@@ -40,8 +42,8 @@ func (c8 *Chip8) Update() error {
 func (c8 *Chip8) Draw(screen *ebiten.Image) {
 	screen.Fill(color.NRGBA{23, 20, 33, 1})
 
-	for h := 0; h < HEIGHT; h++ {
-		for w := 0; w < WIDTH; w++ {
+	for h := 0; h < cpu.HEIGHT; h++ {
+		for w := 0; w < cpu.WIDTH; w++ {
 			if c8.cpu.Display[h][w] == 0x01 {
 				imgOpts := &ebiten.DrawImageOptions{}
 				imgOpts.GeoM.Translate(float64(w*10), float64(h*10))
@@ -56,8 +58,8 @@ func (c8 *Chip8) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHei
 }
 
 func RunChip8(rom []byte, title string) {
-	cpu := NewCpu()
-	cpu.LoadROM(rom)
+	c := cpu.NewCpu()
+	c.LoadROM(rom)
 
 	sqr := ebiten.NewImage(10, 10)
 	sqr.Fill(color.RGBA{51, 209, 122, 1})
@@ -70,10 +72,10 @@ func RunChip8(rom []byte, title string) {
 
 	c8 := &Chip8{
 		square:       sqr,
-		cpu:          &cpu,
+		cpu:          &c,
 		audioPlayer:  p,
-		screenWidth:  WIDTH * 10,
-		screenHeight: HEIGHT * 10,
+		screenWidth:  cpu.WIDTH * 10,
+		screenHeight: cpu.HEIGHT * 10,
 	}
 
 	ebiten.SetWindowSize(c8.screenWidth, c8.screenHeight)

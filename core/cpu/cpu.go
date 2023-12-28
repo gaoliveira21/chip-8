@@ -1,9 +1,10 @@
-package core
+package cpu
 
 import (
 	"math/rand"
 	"time"
 
+	"github.com/gaoliveira21/chip8/core/font"
 	"github.com/gaoliveira21/chip8/core/memory"
 )
 
@@ -44,12 +45,6 @@ type opcode struct {
 	nnn         uint16
 }
 
-func (cpu *CPU) loadFont() {
-	for i := 0x050; i <= 0x09F; i++ {
-		cpu.mmu.Write(uint16(i), FontData[i-0x050])
-	}
-}
-
 func NewCpu() CPU {
 	cpu := CPU{
 		pc: 0x200,
@@ -66,19 +61,8 @@ func (cpu *CPU) LoadROM(rom []byte) {
 	}
 }
 
-func (cpu *CPU) Decode(data uint16) (oc *opcode) {
-	return &opcode{
-		instruction: data & INSTRUCTION_BITMASK,
-		registerX:   uint8((data & X_BITMASK) >> 8),
-		registerY:   uint8((data & Y_BITMASK) >> 4),
-		n:           uint8(data & N_BITMASK),
-		nn:          uint8(data & NN_BITMASK),
-		nnn:         (data & NNN_BITMASK),
-	}
-}
-
 func (cpu *CPU) Run() {
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.delayTimer > 0 {
 		cpu.delayTimer--
@@ -89,11 +73,28 @@ func (cpu *CPU) Run() {
 	}
 }
 
-func (cpu *CPU) Clock() {
+func (cpu *CPU) loadFont() {
+	for i := 0x050; i <= 0x09F; i++ {
+		cpu.mmu.Write(uint16(i), font.FontData[i-0x050])
+	}
+}
+
+func (cpu *CPU) decode(data uint16) (oc *opcode) {
+	return &opcode{
+		instruction: data & INSTRUCTION_BITMASK,
+		registerX:   uint8((data & X_BITMASK) >> 8),
+		registerY:   uint8((data & Y_BITMASK) >> 4),
+		n:           uint8(data & N_BITMASK),
+		nn:          uint8(data & NN_BITMASK),
+		nnn:         (data & NNN_BITMASK),
+	}
+}
+
+func (cpu *CPU) clock() {
 	data := cpu.mmu.Fetch(cpu.pc)
 	cpu.pc += 2
 
-	opcode := cpu.Decode(data)
+	opcode := cpu.decode(data)
 
 	switch opcode.instruction {
 	case 0x0000:

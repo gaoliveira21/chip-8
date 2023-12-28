@@ -1,4 +1,4 @@
-package core
+package font
 
 const (
 	FONT_WIDTH  = 0x0004

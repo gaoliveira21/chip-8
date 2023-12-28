@@ -1,15 +1,17 @@
-package core
+package cpu
 
 import (
 	"os"
 	"slices"
 	"testing"
+
+	"github.com/gaoliveira21/chip8/core/font"
 )
 
 func TestNewCpu(t *testing.T) {
 	cpu := NewCpu()
 
-	inMemoryFonts := [len(FontData)]byte{}
+	inMemoryFonts := [len(font.FontData)]byte{}
 
 	for i := 0x050; i <= 0x09F; i++ {
 		font := cpu.mmu.Fetch(uint16(i))
@@ -21,7 +23,7 @@ func TestNewCpu(t *testing.T) {
 		t.Errorf("cpu.pc = %d; expected 0x200", cpu.pc)
 	}
 
-	if inMemoryFonts != FontData {
+	if inMemoryFonts != font.FontData {
 		t.Error("Error loading fonts")
 	}
 }
@@ -29,7 +31,7 @@ func TestNewCpu(t *testing.T) {
 func TestDecode(t *testing.T) {
 	cpu := NewCpu()
 
-	opcode := cpu.Decode(0xABCD)
+	opcode := cpu.decode(0xABCD)
 
 	var expected uint16 = 0xA000
 
@@ -96,7 +98,7 @@ func TestCLS(t *testing.T) {
 	cpu.Display[0][0] = 0xFF
 	cpu.Display[0][1] = 0xEF
 
-	cpu.Clock()
+	cpu.clock()
 
 	for i := 0; i < HEIGHT; i++ {
 		for j := 0; j < WIDTH; j++ {
@@ -114,7 +116,7 @@ func TestRET(t *testing.T) {
 	cpu.mmu.Write(0x201, 0xEE)
 
 	cpu.mmu.Stack.Push(0xDDEE)
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0xDDEE {
 		t.Errorf("cpu.pc = 0x%X; expected 0xDDEE", cpu.pc)
@@ -127,7 +129,7 @@ func TestJP0x0000(t *testing.T) {
 	cpu.mmu.Write(0x200, 0x01)
 	cpu.mmu.Write(0x201, 0x11)
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0x0111 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x0111", cpu.pc)
@@ -140,7 +142,7 @@ func TestJP0x1000(t *testing.T) {
 	cpu.mmu.Write(0x200, 0x12)
 	cpu.mmu.Write(0x201, 0x34)
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0x0234 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x0111", cpu.pc)
@@ -154,7 +156,7 @@ func TestCALL(t *testing.T) {
 	cpu.mmu.Write(0x301, 0x00)
 
 	cpu.pc = 0x300
-	cpu.Clock()
+	cpu.clock()
 
 	stackPC := cpu.mmu.Stack.Pop()
 	currentPC := cpu.pc
@@ -178,7 +180,7 @@ func TestJPWithOffset(t *testing.T) {
 
 	expected := 0xFF0 + uint16(cpu.v[0x0])
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != uint16(expected) {
 		t.Errorf("cpu.pc = 0x%X; expected 0x%X", cpu.pc, expected)
@@ -193,7 +195,7 @@ func TestSKPVxEqualToNN(t *testing.T) {
 
 	cpu.v[0x5] = 0x68
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0x204 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x204", cpu.pc)
@@ -202,7 +204,7 @@ func TestSKPVxEqualToNN(t *testing.T) {
 	cpu.mmu.Write(0x204, 0x35)
 	cpu.mmu.Write(0x205, 0x70)
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0x206 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x206", cpu.pc)
@@ -217,7 +219,7 @@ func TestSKPVxNotEqualToNN(t *testing.T) {
 
 	cpu.v[0x5] = 0x68
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0x204 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x204", cpu.pc)
@@ -226,7 +228,7 @@ func TestSKPVxNotEqualToNN(t *testing.T) {
 	cpu.mmu.Write(0x204, 0x45)
 	cpu.mmu.Write(0x205, 0x68)
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0x206 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x206", cpu.pc)
@@ -242,7 +244,7 @@ func TestSKPVxEqualToVy(t *testing.T) {
 	cpu.v[0x5] = 0x68
 	cpu.v[0x6] = 0x68
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0x204 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x204", cpu.pc)
@@ -254,7 +256,7 @@ func TestSKPVxEqualToVy(t *testing.T) {
 	cpu.v[0x5] = 0x70
 	cpu.v[0x6] = 0x71
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0x206 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x206", cpu.pc)
@@ -267,7 +269,7 @@ func TestLDNNToVx(t *testing.T) {
 	cpu.mmu.Write(0x200, 0x61)
 	cpu.mmu.Write(0x201, 0xFF)
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[0x1] != 0xFF {
 		t.Errorf("cpu.v[0x1] = 0x%X; expected 0x%X", cpu.v[0x1], 0xFF)
@@ -282,7 +284,7 @@ func TestLDVyToVx(t *testing.T) {
 
 	cpu.v[0x2] = 0x60
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[0x1] != 0x60 {
 		t.Errorf("cpu.v[0x1] = 0x%X; expected 0x%X", cpu.v[0x1], 0x60)
@@ -299,7 +301,7 @@ func TestADD(t *testing.T) {
 
 	cpu.v[vIndex] = 0x02
 
-	cpu.Clock()
+	cpu.clock()
 
 	expected := 0x05
 
@@ -320,7 +322,7 @@ func TestADDWitoutCarry(t *testing.T) {
 	cpu.v[vIndex] = 0x02
 	cpu.v[yIndex] = 0x03
 
-	cpu.Clock()
+	cpu.clock()
 
 	expected := 0x05
 
@@ -345,7 +347,7 @@ func TestADDWithCarry(t *testing.T) {
 	cpu.v[vIndex] = 0xEE
 	cpu.v[yIndex] = 0xEE
 
-	cpu.Clock()
+	cpu.clock()
 
 	expected := 0xEE + 0xEE
 
@@ -369,7 +371,7 @@ func TestVxORVy(t *testing.T) {
 
 	expected := byte(0x05 | 0x10)
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[0x1] != expected {
 		t.Errorf("cpu.v[0x1] = 0x%X; expected 0x%X", cpu.v[0x1], expected)
@@ -387,7 +389,7 @@ func TestVxANDVy(t *testing.T) {
 
 	expected := byte(0x05 & 0x10)
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[0x1] != expected {
 		t.Errorf("cpu.v[0x1] = 0x%X; expected 0x%X", cpu.v[0x1], expected)
@@ -405,7 +407,7 @@ func TestVxXORVy(t *testing.T) {
 
 	expected := byte(0x05 ^ 0x10)
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[0x1] != expected {
 		t.Errorf("cpu.v[0x1] = 0x%X; expected 0x%X", cpu.v[0x1], expected)
@@ -427,7 +429,7 @@ func TestSUBWithoutCarry(t *testing.T) {
 
 	expected := 0x2 - 0x3
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[vxIndex] != byte(expected) {
 		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vxIndex, cpu.v[vxIndex], expected)
@@ -452,7 +454,7 @@ func TestSUBWithCarry(t *testing.T) {
 
 	expected := 0x3 - 0x2
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[vxIndex] != byte(expected) {
 		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vxIndex, cpu.v[vxIndex], expected)
@@ -473,7 +475,7 @@ func TestSHRWithoutFlag(t *testing.T) {
 	cpu.v[vIndex] = 0b11111110
 	expected := cpu.v[vIndex] >> 1
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[vIndex] != expected {
 		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
@@ -494,7 +496,7 @@ func TestSHRWithFlag(t *testing.T) {
 	cpu.v[vIndex] = 0b00000001
 	expected := cpu.v[vIndex] >> 1
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[vIndex] != expected {
 		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
@@ -515,7 +517,7 @@ func TestSHLWithoutFlag(t *testing.T) {
 	cpu.v[vIndex] = 0b01111110
 	expected := cpu.v[vIndex] << 1
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[vIndex] != expected {
 		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
@@ -536,7 +538,7 @@ func TestSHLWithFlag(t *testing.T) {
 	cpu.v[vIndex] = 0b11111110
 	expected := cpu.v[vIndex] << 1
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[vIndex] != expected {
 		t.Errorf("cpu.v[%d] = 0x%X; expected 0x%X", vIndex, cpu.v[vIndex], expected)
@@ -556,7 +558,7 @@ func TestSKPVxNotEqualToVy(t *testing.T) {
 	cpu.v[0x5] = 0x70
 	cpu.v[0x6] = 0x71
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0x204 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x204", cpu.pc)
@@ -568,7 +570,7 @@ func TestSKPVxNotEqualToVy(t *testing.T) {
 	cpu.v[0x5] = 0x70
 	cpu.v[0x6] = 0x70
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.pc != 0x206 {
 		t.Errorf("cpu.pc = 0x%X; expected 0x206", cpu.pc)
@@ -583,7 +585,7 @@ func TestLDI(t *testing.T) {
 
 	var expected uint16 = 0x0ABC
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.i != expected {
 		t.Errorf("cpu.i = 0x%X; expected 0x%X", cpu.i, expected)
@@ -716,7 +718,7 @@ func TestDRWNoWrapAndNoCollision(t *testing.T) {
 
 	cpu.cls()
 
-	cpu.Clock()
+	cpu.clock()
 
 	if cpu.v[0xF] != 0x00 {
 		t.Errorf("cpu.v[0xF] = 0x%X; expected 0x00", cpu.v[0xF])
