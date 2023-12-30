@@ -9,7 +9,10 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${fileDirname}"
+      "program": "${fileDirname}",
+      "args": [
+        "-rom=${fileDirname}/roms/test/scrolling.ch8"
+      ]
     }
   ]
 }

@@ -11,11 +11,9 @@ import (
 )
 
 type Chip8 struct {
-	cpu          *cpu.CPU
-	square       *ebiten.Image
-	audioPlayer  audio.AudioPlayer
-	screenWidth  int
-	screenHeight int
+	cpu         *cpu.CPU
+	square      *ebiten.Image
+	audioPlayer audio.AudioPlayer
 }
 
 func (c8 *Chip8) Update() error {
@@ -29,6 +27,10 @@ func (c8 *Chip8) Update() error {
 		}
 
 		c8.cpu.Run()
+
+		if c8.cpu.ResizeWindow {
+			ebiten.SetWindowSize(c8.cpu.Graphics.Width*10, c8.cpu.Graphics.Height*10)
+		}
 
 		if c8.cpu.SoundTimer > 0 && c8.audioPlayer != nil {
 			c8.audioPlayer.Play()
@@ -54,7 +56,7 @@ func (c8 *Chip8) Draw(screen *ebiten.Image) {
 }
 
 func (c8 *Chip8) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return c8.screenWidth, c8.screenHeight
+	return c8.cpu.Graphics.Width * 10, c8.cpu.Graphics.Height * 10
 }
 
 func RunChip8(rom []byte, title string) {
@@ -71,14 +73,12 @@ func RunChip8(rom []byte, title string) {
 	}
 
 	c8 := &Chip8{
-		square:       sqr,
-		cpu:          &c,
-		audioPlayer:  p,
-		screenWidth:  c.Graphics.Width * 10,
-		screenHeight: c.Graphics.Height * 10,
+		square:      sqr,
+		cpu:         &c,
+		audioPlayer: p,
 	}
 
-	ebiten.SetWindowSize(c8.screenWidth, c8.screenHeight)
+	ebiten.SetWindowSize(c.Graphics.Width*10, c.Graphics.Height*10)
 	ebiten.SetWindowTitle(title)
 
 	if err := ebiten.RunGame(c8); err != nil {

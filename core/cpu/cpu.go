@@ -21,14 +21,15 @@ const (
 )
 
 type CPU struct {
-	pc         uint16   // Program Counter
-	i          uint16   // I Register
-	v          [16]byte // Variable registers
-	mmu        memory.MMU
-	Graphics   *graphics.Graphics
-	delayTimer uint8
-	SoundTimer uint8
-	Keys       [16]uint8
+	pc           uint16   // Program Counter
+	i            uint16   // I Register
+	v            [16]byte // Variable registers
+	mmu          memory.MMU
+	Graphics     *graphics.Graphics
+	delayTimer   uint8
+	SoundTimer   uint8
+	Keys         [16]uint8
+	ResizeWindow bool
 }
 
 func NewCpu() CPU {
@@ -84,6 +85,12 @@ func (cpu *CPU) clock() {
 
 		case 0x0EE:
 			cpu.ret()
+
+		case 0x0FE:
+			cpu.low()
+
+		case 0x0FF:
+			cpu.high()
 
 		default:
 			cpu.jp(opcode.nnn, 0)
@@ -329,4 +336,16 @@ func (cpu *CPU) drw(oc *opcode) {
 			break
 		}
 	}
+}
+
+// SCHIP Instructions
+
+func (cpu *CPU) high() {
+	cpu.Graphics.EnableHighResolutionMode()
+	cpu.ResizeWindow = true
+}
+
+func (cpu *CPU) low() {
+	cpu.Graphics.DisableHighResolutionMode()
+	cpu.ResizeWindow = true
 }
