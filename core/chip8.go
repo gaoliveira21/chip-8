@@ -30,6 +30,7 @@ func (c8 *Chip8) Update() error {
 
 		if c8.cpu.ResizeWindow {
 			ebiten.SetWindowSize(c8.cpu.Graphics.Width*10, c8.cpu.Graphics.Height*10)
+			c8.cpu.ResizeWindow = false
 		}
 
 		if c8.cpu.SoundTimer > 0 && c8.audioPlayer != nil {

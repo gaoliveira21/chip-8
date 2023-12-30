@@ -1,6 +1,7 @@
 package cpu
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -79,6 +80,11 @@ func (cpu *CPU) clock() {
 
 	switch opcode.instruction {
 	case 0x0000:
+		switch opcode.registerY {
+		case 0xC:
+			cpu.scd(opcode.n)
+		}
+
 		switch opcode.nnn {
 		case 0x0E0:
 			cpu.cls()
@@ -91,6 +97,15 @@ func (cpu *CPU) clock() {
 
 		case 0x0FF:
 			cpu.high()
+
+		case 0x0FB:
+			cpu.scr()
+
+		case 0x0FC:
+			cpu.scl()
+
+		case 0x0FD:
+			fmt.Printf("00FD exit - not implemented")
 
 		default:
 			cpu.jp(opcode.nnn, 0)
@@ -139,7 +154,12 @@ func (cpu *CPU) clock() {
 	case 0xC000:
 		cpu.rnd(opcode.registerX, opcode.nn)
 	case 0xD000:
-		cpu.drw(opcode)
+		switch opcode.n {
+		case 0x0:
+			fmt.Printf("DXY0 sprite vx vy 0 - not implemented")
+		default:
+			cpu.drw(opcode)
+		}
 	case 0xE000:
 		switch opcode.nn {
 		case 0x9E:
@@ -161,12 +181,18 @@ func (cpu *CPU) clock() {
 			cpu.adi(uint16(cpu.v[opcode.registerX]))
 		case 0x29:
 			cpu.ldi(0x050 + 5*uint16(cpu.v[opcode.registerX]))
+		case 0x30:
+			fmt.Printf("FX30 i := bighex vx - not implemented")
 		case 0x33:
 			cpu.bcd(cpu.v[opcode.registerX])
 		case 0x55:
 			cpu.stm(opcode.registerX)
 		case 0x65:
 			cpu.ldm(opcode.registerX)
+		case 0x75:
+			fmt.Printf("FX75 saveflags vx - not implemented")
+		case 0x85:
+			fmt.Printf("FX85 loadflags vx - not implemented")
 		}
 	}
 }
@@ -348,4 +374,16 @@ func (cpu *CPU) high() {
 func (cpu *CPU) low() {
 	cpu.Graphics.DisableHighResolutionMode()
 	cpu.ResizeWindow = true
+}
+
+func (cpu *CPU) scd(shift uint8) {
+	cpu.Graphics.ScrollDown(shift)
+}
+
+func (cpu *CPU) scr() {
+	cpu.Graphics.ScrollRight()
+}
+
+func (cpu *CPU) scl() {
+	cpu.Graphics.ScrollLeft()
 }

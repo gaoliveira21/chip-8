@@ -56,3 +56,43 @@ func (g *Graphics) DisableHighResolutionMode() {
 
 	g.display = newDisplay(g.Height, g.Width)
 }
+
+func (g *Graphics) ScrollDown(shift uint8) {
+	s := int(shift)
+
+	for i := g.Height - 1; i >= s; i-- {
+		g.display[i] = g.display[i-s]
+	}
+
+	for i := 0; i < s; i++ {
+		g.display[i] = make([]byte, g.Width)
+	}
+}
+
+func (g *Graphics) ScrollRight() {
+	s := 4
+
+	for i := 0; i < g.Height; i++ {
+		for j := g.Width - 1; j >= 0; j-- {
+			if j < s {
+				g.display[i][j] = 0x0
+			} else {
+				g.display[i][j] = g.display[i][j-s]
+			}
+		}
+	}
+}
+
+func (g *Graphics) ScrollLeft() {
+	s := 4
+
+	for i := 0; i < g.Height; i++ {
+		for j := 0; j < g.Width; j++ {
+			if j < (g.Width - s) {
+				g.display[i][j] = g.display[i][j+s]
+			} else {
+				g.display[i][j] = 0x0
+			}
+		}
+	}
+}
