@@ -80,9 +80,9 @@ func (cpu *CPU) clock() {
 
 	switch opcode.instruction {
 	case 0x0000:
-		switch opcode.registerY {
-		case 0xC:
+		if opcode.registerY == 0xC {
 			cpu.scd(opcode.n)
+			return
 		}
 
 		switch opcode.nnn {
@@ -330,8 +330,8 @@ func (cpu *CPU) ldm(vIndex uint8) {
 }
 
 func (cpu *CPU) drw(oc *opcode) {
-	x := cpu.v[oc.registerX] & 0x3F
-	y := cpu.v[oc.registerY] & 0x1F
+	x := cpu.v[oc.registerX] & (byte(cpu.Graphics.Width - 1))
+	y := cpu.v[oc.registerY] & (byte(cpu.Graphics.Height - 1))
 	cpu.v[0xF] = 0x00
 
 	for i := 0; uint8(i) < oc.n; i++ {
