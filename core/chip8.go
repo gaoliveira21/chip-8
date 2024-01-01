@@ -17,7 +17,7 @@ type Chip8 struct {
 }
 
 func (c8 *Chip8) Update() error {
-	for i := 0; i < int(cpu.FREQUENCY/60); i++ {
+	for i := 0; i < cpu.SPEED; i++ {
 		for key, value := range input.Keypad {
 			if ebiten.IsKeyPressed(key) {
 				c8.cpu.Keys[value] = 0x01

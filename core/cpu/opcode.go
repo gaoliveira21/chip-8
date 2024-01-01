@@ -1,5 +1,14 @@
 package cpu
 
+const (
+	INSTRUCTION_BITMASK = 0xF000
+	X_BITMASK           = 0x0F00
+	Y_BITMASK           = 0x00F0
+	N_BITMASK           = 0x000F
+	NN_BITMASK          = 0x00FF
+	NNN_BITMASK         = 0x0FFF
+)
+
 type opcode struct {
 	instruction uint16
 	registerX   uint8
