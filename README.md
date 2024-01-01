@@ -5,6 +5,7 @@ A CHIP-8 Emulator project to put GoLang in practice and learn how an emulator wo
 ![test_opcode](./cli/assets/test_opcode.png)
 
 [corax89’s chip8-test-rom](https://github.com/corax89/chip8-test-rom)
+[Timendus' chip-8 test suite](https://github.com/Timendus/chip8-test-suite)
 
 # Demo
 
@@ -44,7 +45,7 @@ Chip-8 browser demo available in the following link:
 - [ ] Add SUPER-CHIP support
 - [ ] Add XO-CHIP support
 
-# Credits
+# References
 
 This is a list of useful resources that I consulted for build this project.
 
@@ -53,3 +54,7 @@ This is a list of useful resources that I consulted for build this project.
 - Tobias V. Langhoff: [Guide to making a CHIP-8 emulator](https://tobiasvl.github.io/blog/write-a-chip-8-emulator)
 
 - h4ck3rk3y: [go-8](https://github.com/h4ck3rk3y/go-8/tree/master)
+
+-  cassianoperin: [CHIP8_GO ](https://github.com/cassianoperin/CHIP8_GO)
+
+- Octo: [Mastering SuperChip](http://johnearnest.github.io/Octo/docs/SuperChip.html)
