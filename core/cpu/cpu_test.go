@@ -11,20 +11,24 @@ import (
 func TestNewCpu(t *testing.T) {
 	cpu := NewCpu()
 
-	inMemoryFonts := [len(font.FontData)]byte{}
-
 	for i := 0x050; i <= 0x09F; i++ {
-		font := cpu.mmu.Fetch(uint16(i))
+		f := byte(cpu.mmu.Fetch(uint16(i)) >> 8)
 
-		inMemoryFonts[i-0x050] = byte(font >> 8)
+		if font.CHIP8_FontData[i-0x050] != f {
+			t.Errorf("CHIP8_FontData[%d] = 0x%X; expected 0x%X", i-0x050, f, font.CHIP8_FontData[i-0x050])
+		}
+	}
+
+	for i := 0x0A0; i <= 0x013F; i++ {
+		f := byte(cpu.mmu.Fetch(uint16(i)) >> 8)
+
+		if font.SCHIP_FontData[i-0x0A0] != f {
+			t.Errorf("SCHIP_FontData[%d] = 0x%X; expected 0x%X", i-0x0A0, f, font.SCHIP_FontData[i-0x0A0])
+		}
 	}
 
 	if cpu.pc != 0x200 {
 		t.Errorf("cpu.pc = %d; expected 0x200", cpu.pc)
-	}
-
-	if inMemoryFonts != font.FontData {
-		t.Error("Error loading fonts")
 	}
 }
 

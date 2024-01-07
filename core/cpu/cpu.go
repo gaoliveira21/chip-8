@@ -56,8 +56,12 @@ func (cpu *CPU) Run() {
 }
 
 func (cpu *CPU) loadFont() {
-	for i := 0x050; i <= 0x09F; i++ {
-		cpu.mmu.Write(uint16(i), font.FontData[i-0x050])
+	for i := 0; i < len(font.CHIP8_FontData); i++ {
+		cpu.mmu.Write(uint16(i)+0x050, font.CHIP8_FontData[i])
+	}
+
+	for i := 0; i < len(font.SCHIP_FontData); i++ {
+		cpu.mmu.Write(uint16(i)+0x0A0, font.SCHIP_FontData[i])
 	}
 }
 
@@ -175,7 +179,7 @@ func (cpu *CPU) clock() {
 		case 0x29:
 			cpu.ldi(0x050 + 5*uint16(cpu.v[opcode.registerX]))
 		case 0x30:
-			fmt.Printf("FX30 i := bighex vx - not implemented")
+			cpu.ldi(0x0A0 + 10*uint16(cpu.v[opcode.registerX]))
 		case 0x33:
 			cpu.bcd(cpu.v[opcode.registerX])
 		case 0x55:
