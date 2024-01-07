@@ -2,7 +2,9 @@ package cpu
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/gaoliveira21/chip8/core/font"
@@ -102,7 +104,7 @@ func (cpu *CPU) clock() {
 			cpu.scl()
 
 		case 0x0FD:
-			fmt.Printf("00FD exit - not implemented")
+			cpu.ext()
 
 		default:
 			cpu.jp(opcode.nnn, 0)
@@ -383,4 +385,9 @@ func (cpu *CPU) scr() {
 
 func (cpu *CPU) scl() {
 	cpu.Graphics.ScrollLeft()
+}
+
+func (cpu *CPU) ext() {
+	log.Println("SCHIP [0x00FD] - Exit emulator")
+	os.Exit(0x0)
 }
