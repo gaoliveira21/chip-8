@@ -17,15 +17,22 @@ const (
 )
 
 type CPU struct {
-	pc           uint16   // Program Counter
-	i            uint16   // I Register
-	v            [16]byte // Variable registers
-	mmu          memory.MMU
-	Graphics     *graphics.Graphics
-	delayTimer   uint8
-	SoundTimer   uint8
+	pc       uint16   // Program Counter
+	i        uint16   // I Register
+	v        [16]byte // Variable registers
+	mmu      memory.MMU
+	Graphics *graphics.Graphics
+
+	// Timers
+	delayTimer uint8
+	SoundTimer uint8
+
+	// Flags
 	Keys         [16]uint8
 	ResizeWindow bool
+
+	// SCHIP Flags
+	RPL [8]byte
 }
 
 func NewCpu() CPU {
@@ -189,9 +196,9 @@ func (cpu *CPU) clock() {
 		case 0x65:
 			cpu.ldm(opcode.registerX)
 		case 0x75:
-			fmt.Printf("FX75 saveflags vx - not implemented")
+			cpu.srpl(opcode.registerX)
 		case 0x85:
-			fmt.Printf("FX85 loadflags vx - not implemented")
+			cpu.lrpl(opcode.registerX)
 		}
 	}
 }
@@ -390,4 +397,16 @@ func (cpu *CPU) scl() {
 func (cpu *CPU) ext() {
 	log.Println("SCHIP [0x00FD] - Exit emulator")
 	os.Exit(0x0)
+}
+
+func (cpu *CPU) srpl(x uint8) {
+	for i := 0; i <= int(x); i++ {
+		cpu.RPL[i] = cpu.v[i]
+	}
+}
+
+func (cpu *CPU) lrpl(x uint8) {
+	for i := 0; i <= int(x); i++ {
+		cpu.v[i] = cpu.RPL[i]
+	}
 }
