@@ -42,7 +42,7 @@ Chip-8 browser demo available in the following link:
   - [X] Select ROM
 - [ ] Add configuration file to change color and keypad
 - [ ] Improve unit tests
-- [ ] Add SUPER-CHIP support
+- [X] Add SUPER-CHIP support
 - [ ] Add XO-CHIP support
 
 # References
