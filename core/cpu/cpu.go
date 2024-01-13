@@ -1,7 +1,6 @@
 package cpu
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -32,7 +31,8 @@ type CPU struct {
 	ResizeWindow bool
 
 	// SCHIP Flags
-	RPL [8]byte
+	RPL         [8]byte
+	SCHIP_HIRES bool
 }
 
 func NewCpu() CPU {
@@ -162,7 +162,7 @@ func (cpu *CPU) clock() {
 	case 0xD000:
 		switch opcode.n {
 		case 0x0:
-			fmt.Printf("DXY0 sprite vx vy 0 - not implemented")
+			cpu.schip_drw(opcode)
 		default:
 			cpu.drw(opcode)
 		}
@@ -347,13 +347,7 @@ func (cpu *CPU) drw(oc *opcode) {
 
 		for j := 0; j < 8; j++ {
 			bit := (pixels >> (7 - j)) & 0x01
-			pixelOnDisplay := cpu.Graphics.GetPixel(int(y), int(xIndex))
-
-			if bit == 0x01 && pixelOnDisplay == 0x01 {
-				cpu.v[0xF] = 0x01
-			}
-
-			cpu.Graphics.SetPixel(int(y), int(xIndex), pixelOnDisplay^bit)
+			cpu.drawBit(bit, int(y), int(xIndex))
 
 			xIndex++
 
@@ -375,11 +369,13 @@ func (cpu *CPU) drw(oc *opcode) {
 func (cpu *CPU) high() {
 	cpu.Graphics.EnableHighResolutionMode()
 	cpu.ResizeWindow = true
+	cpu.SCHIP_HIRES = true
 }
 
 func (cpu *CPU) low() {
 	cpu.Graphics.DisableHighResolutionMode()
 	cpu.ResizeWindow = true
+	cpu.SCHIP_HIRES = false
 }
 
 func (cpu *CPU) scd(shift uint8) {
@@ -409,4 +405,66 @@ func (cpu *CPU) lrpl(x uint8) {
 	for i := 0; i <= int(x); i++ {
 		cpu.v[i] = cpu.RPL[i]
 	}
+}
+
+func (cpu *CPU) schip_drw(oc *opcode) {
+	x := cpu.v[oc.registerX] & (byte(cpu.Graphics.Width - 1))
+	y := cpu.v[oc.registerY] & (byte(cpu.Graphics.Height - 1))
+	cpu.v[0xF] = 0x00
+
+	n := 16
+
+	for i := 0; i < n; i++ {
+		var sprite1 byte
+		var sprite2 byte
+
+		if cpu.SCHIP_HIRES {
+			sprite1 = byte(cpu.mmu.Fetch((uint16(i)*2)+cpu.i) >> 8)
+			sprite2 = byte(cpu.mmu.Fetch((uint16(i)*2)+cpu.i+1) >> 8)
+		} else {
+			sprite1 = byte(cpu.mmu.Fetch(uint16(i)+cpu.i) >> 8)
+		}
+
+		xIndex := x
+
+		for j := 0; j < 8; j++ {
+			bit := (sprite1 >> (7 - j)) & 0x01
+			cpu.drawBit(bit, int(y), int(xIndex))
+
+			xIndex++
+
+			if int(xIndex) >= cpu.Graphics.Width {
+				break
+			}
+		}
+
+		if cpu.SCHIP_HIRES {
+			for j := 0; j < 8; j++ {
+				if int(xIndex) >= cpu.Graphics.Width {
+					break
+				}
+
+				bit := (sprite2 >> (7 - j)) & 0x01
+				cpu.drawBit(bit, int(y), int(xIndex))
+
+				xIndex++
+			}
+		}
+
+		y++
+
+		if int(y) >= cpu.Graphics.Height {
+			break
+		}
+	}
+}
+
+func (cpu *CPU) drawBit(bit byte, y int, x int) {
+	pixelOnDisplay := cpu.Graphics.GetPixel(int(y), int(x))
+
+	if bit == 0x01 && pixelOnDisplay == 0x01 {
+		cpu.v[0xF] = 0x01
+	}
+
+	cpu.Graphics.SetPixel(int(y), int(x), pixelOnDisplay^bit)
 }
