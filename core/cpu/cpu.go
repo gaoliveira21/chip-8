@@ -74,6 +74,16 @@ func (cpu *CPU) loadFont() {
 	}
 }
 
+func (cpu *CPU) drawBit(bit byte, y int, x int) {
+	pixelOnDisplay := cpu.Graphics.GetPixel(int(y), int(x))
+
+	if bit == 0x01 && pixelOnDisplay == 0x01 {
+		cpu.v[0xF] = 0x01
+	}
+
+	cpu.Graphics.SetPixel(int(y), int(x), pixelOnDisplay^bit)
+}
+
 func (cpu *CPU) decode(data uint16) (oc *opcode) {
 	return NewOpcode(data)
 }
@@ -457,14 +467,4 @@ func (cpu *CPU) schip_drw(oc *opcode) {
 			break
 		}
 	}
-}
-
-func (cpu *CPU) drawBit(bit byte, y int, x int) {
-	pixelOnDisplay := cpu.Graphics.GetPixel(int(y), int(x))
-
-	if bit == 0x01 && pixelOnDisplay == 0x01 {
-		cpu.v[0xF] = 0x01
-	}
-
-	cpu.Graphics.SetPixel(int(y), int(x), pixelOnDisplay^bit)
 }
