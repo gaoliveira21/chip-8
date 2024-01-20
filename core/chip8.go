@@ -61,6 +61,8 @@ func (c8 *Chip8) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHei
 }
 
 func RunChip8(rom []byte, title string) {
+	Disassemble(rom)
+
 	c := cpu.NewCpu()
 	c.LoadROM(rom)
 

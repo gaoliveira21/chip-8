@@ -10,21 +10,21 @@ const (
 )
 
 type opcode struct {
-	instruction uint16
-	registerX   uint8
-	registerY   uint8
-	n           uint8
-	nn          uint8
-	nnn         uint16
+	Instruction uint16
+	RegisterX   uint8
+	RegisterY   uint8
+	N           uint8
+	NN          uint8
+	NNN         uint16
 }
 
 func NewOpcode(data uint16) *opcode {
 	return &opcode{
-		instruction: data & INSTRUCTION_BITMASK,
-		registerX:   uint8((data & X_BITMASK) >> 8),
-		registerY:   uint8((data & Y_BITMASK) >> 4),
-		n:           uint8(data & N_BITMASK),
-		nn:          uint8(data & NN_BITMASK),
-		nnn:         (data & NNN_BITMASK),
+		Instruction: data & INSTRUCTION_BITMASK,
+		RegisterX:   uint8((data & X_BITMASK) >> 8),
+		RegisterY:   uint8((data & Y_BITMASK) >> 4),
+		N:           uint8(data & N_BITMASK),
+		NN:          uint8(data & NN_BITMASK),
+		NNN:         (data & NNN_BITMASK),
 	}
 }

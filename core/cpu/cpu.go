@@ -94,14 +94,14 @@ func (cpu *CPU) clock() {
 
 	opcode := cpu.decode(data)
 
-	switch opcode.instruction {
+	switch opcode.Instruction {
 	case 0x0000:
-		if opcode.registerY == 0xC {
-			cpu.scd(opcode.n)
+		if opcode.RegisterY == 0xC {
+			cpu.scd(opcode.N)
 			return
 		}
 
-		switch opcode.nnn {
+		switch opcode.NNN {
 		case 0x0E0:
 			cpu.cls()
 
@@ -124,91 +124,91 @@ func (cpu *CPU) clock() {
 			cpu.ext()
 
 		default:
-			cpu.jp(opcode.nnn, 0)
+			cpu.jp(opcode.NNN, 0)
 		}
 	case 0x1000:
-		cpu.jp(opcode.nnn, 0)
+		cpu.jp(opcode.NNN, 0)
 	case 0x2000:
-		cpu.call(opcode.nnn)
+		cpu.call(opcode.NNN)
 	case 0x3000:
-		cpu.skp(cpu.v[opcode.registerX] == opcode.nn)
+		cpu.skp(cpu.v[opcode.RegisterX] == opcode.NN)
 	case 0x4000:
-		cpu.skp(cpu.v[opcode.registerX] != opcode.nn)
+		cpu.skp(cpu.v[opcode.RegisterX] != opcode.NN)
 	case 0x5000:
-		cpu.skp(cpu.v[opcode.registerX] == cpu.v[opcode.registerY])
+		cpu.skp(cpu.v[opcode.RegisterX] == cpu.v[opcode.RegisterY])
 	case 0x6000:
-		cpu.ld(opcode.registerX, opcode.nn)
+		cpu.ld(opcode.RegisterX, opcode.NN)
 	case 0x7000:
-		cpu.add(opcode.registerX, opcode.nn, false)
+		cpu.add(opcode.RegisterX, opcode.NN, false)
 	case 0x8000:
-		switch opcode.n {
+		switch opcode.N {
 		case 0x0:
-			cpu.ld(opcode.registerX, cpu.v[opcode.registerY])
+			cpu.ld(opcode.RegisterX, cpu.v[opcode.RegisterY])
 		case 0x1:
-			cpu.or(opcode.registerX, cpu.v[opcode.registerY])
+			cpu.or(opcode.RegisterX, cpu.v[opcode.RegisterY])
 		case 0x2:
-			cpu.and(opcode.registerX, cpu.v[opcode.registerY])
+			cpu.and(opcode.RegisterX, cpu.v[opcode.RegisterY])
 		case 0x3:
-			cpu.xor(opcode.registerX, cpu.v[opcode.registerY])
+			cpu.xor(opcode.RegisterX, cpu.v[opcode.RegisterY])
 		case 0x4:
-			cpu.add(opcode.registerX, cpu.v[opcode.registerY], true)
+			cpu.add(opcode.RegisterX, cpu.v[opcode.RegisterY], true)
 		case 0x5:
-			cpu.sub(opcode.registerX, cpu.v[opcode.registerX], cpu.v[opcode.registerY])
+			cpu.sub(opcode.RegisterX, cpu.v[opcode.RegisterX], cpu.v[opcode.RegisterY])
 		case 0x6:
-			cpu.shr(opcode.registerX)
+			cpu.shr(opcode.RegisterX)
 		case 0x7:
-			cpu.sub(opcode.registerX, cpu.v[opcode.registerY], cpu.v[opcode.registerX])
+			cpu.sub(opcode.RegisterX, cpu.v[opcode.RegisterY], cpu.v[opcode.RegisterX])
 		case 0xE:
-			cpu.shl(opcode.registerX)
+			cpu.shl(opcode.RegisterX)
 		}
 	case 0x9000:
-		cpu.skp(cpu.v[opcode.registerX] != cpu.v[opcode.registerY])
+		cpu.skp(cpu.v[opcode.RegisterX] != cpu.v[opcode.RegisterY])
 	case 0xA000:
-		cpu.ldi(opcode.nnn)
+		cpu.ldi(opcode.NNN)
 	case 0xB000:
-		cpu.jp(opcode.nnn, cpu.v[0x0])
+		cpu.jp(opcode.NNN, cpu.v[0x0])
 	case 0xC000:
-		cpu.rnd(opcode.registerX, opcode.nn)
+		cpu.rnd(opcode.RegisterX, opcode.NN)
 	case 0xD000:
-		switch opcode.n {
+		switch opcode.N {
 		case 0x0:
 			cpu.schip_drw(opcode)
 		default:
 			cpu.drw(opcode)
 		}
 	case 0xE000:
-		switch opcode.nn {
+		switch opcode.NN {
 		case 0x9E:
-			cpu.skp(cpu.Keys[cpu.v[opcode.registerX]] == 0x01)
+			cpu.skp(cpu.Keys[cpu.v[opcode.RegisterX]] == 0x01)
 		case 0xA1:
-			cpu.skp(cpu.Keys[cpu.v[opcode.registerX]] == 0x00)
+			cpu.skp(cpu.Keys[cpu.v[opcode.RegisterX]] == 0x00)
 		}
 	case 0xF000:
-		switch opcode.nn {
+		switch opcode.NN {
 		case 0x07:
-			cpu.ld(opcode.registerX, cpu.delayTimer)
+			cpu.ld(opcode.RegisterX, cpu.delayTimer)
 		case 0x15:
-			cpu.ldt(cpu.v[opcode.registerX])
+			cpu.ldt(cpu.v[opcode.RegisterX])
 		case 0x18:
-			cpu.lds(cpu.v[opcode.registerX])
+			cpu.lds(cpu.v[opcode.RegisterX])
 		case 0x0A:
-			cpu.ldk(opcode.registerX)
+			cpu.ldk(opcode.RegisterX)
 		case 0x1E:
-			cpu.adi(uint16(cpu.v[opcode.registerX]))
+			cpu.adi(uint16(cpu.v[opcode.RegisterX]))
 		case 0x29:
-			cpu.ldi(0x050 + 5*uint16(cpu.v[opcode.registerX]))
+			cpu.ldi(0x050 + 5*uint16(cpu.v[opcode.RegisterX]))
 		case 0x30:
-			cpu.ldi(0x0A0 + 10*uint16(cpu.v[opcode.registerX]))
+			cpu.ldi(0x0A0 + 10*uint16(cpu.v[opcode.RegisterX]))
 		case 0x33:
-			cpu.bcd(cpu.v[opcode.registerX])
+			cpu.bcd(cpu.v[opcode.RegisterX])
 		case 0x55:
-			cpu.stm(opcode.registerX)
+			cpu.stm(opcode.RegisterX)
 		case 0x65:
-			cpu.ldm(opcode.registerX)
+			cpu.ldm(opcode.RegisterX)
 		case 0x75:
-			cpu.srpl(opcode.registerX)
+			cpu.srpl(opcode.RegisterX)
 		case 0x85:
-			cpu.lrpl(opcode.registerX)
+			cpu.lrpl(opcode.RegisterX)
 		}
 	}
 }
@@ -346,11 +346,11 @@ func (cpu *CPU) ldm(vIndex uint8) {
 }
 
 func (cpu *CPU) drw(oc *opcode) {
-	x := cpu.v[oc.registerX] & (byte(cpu.Graphics.Width - 1))
-	y := cpu.v[oc.registerY] & (byte(cpu.Graphics.Height - 1))
+	x := cpu.v[oc.RegisterX] & (byte(cpu.Graphics.Width - 1))
+	y := cpu.v[oc.RegisterY] & (byte(cpu.Graphics.Height - 1))
 	cpu.v[0xF] = 0x00
 
-	for i := 0; uint8(i) < oc.n; i++ {
+	for i := 0; uint8(i) < oc.N; i++ {
 		addr := uint16(i) + cpu.i
 		pixels := byte(cpu.mmu.Fetch(addr) >> 8)
 		xIndex := x
@@ -418,8 +418,8 @@ func (cpu *CPU) lrpl(x uint8) {
 }
 
 func (cpu *CPU) schip_drw(oc *opcode) {
-	x := cpu.v[oc.registerX] & (byte(cpu.Graphics.Width - 1))
-	y := cpu.v[oc.registerY] & (byte(cpu.Graphics.Height - 1))
+	x := cpu.v[oc.RegisterX] & (byte(cpu.Graphics.Width - 1))
+	y := cpu.v[oc.RegisterY] & (byte(cpu.Graphics.Height - 1))
 	cpu.v[0xF] = 0x00
 
 	n := 16

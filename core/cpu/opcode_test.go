@@ -9,32 +9,32 @@ func TestDecode(t *testing.T) {
 
 	var expected uint16 = 0xA000
 
-	if opcode.instruction != expected {
-		t.Errorf("opcode.instruction = 0x%X; expected 0x%X", opcode.instruction, expected)
+	if opcode.Instruction != expected {
+		t.Errorf("opcode.Instruction = 0x%X; expected 0x%X", opcode.Instruction, expected)
 	}
 
 	expected = 0xB
-	if opcode.registerX != uint8(expected) {
-		t.Errorf("opcode.registerX = 0x%X; expected 0x%X", opcode.registerX, expected)
+	if opcode.RegisterX != uint8(expected) {
+		t.Errorf("opcode.RegisterX = 0x%X; expected 0x%X", opcode.RegisterX, expected)
 	}
 
 	expected = 0xC
-	if opcode.registerY != uint8(expected) {
-		t.Errorf("opcode.registerY = 0x%X; expected 0x%X", opcode.registerY, expected)
+	if opcode.RegisterY != uint8(expected) {
+		t.Errorf("opcode.RegisterY = 0x%X; expected 0x%X", opcode.RegisterY, expected)
 	}
 
 	expected = 0xD
-	if opcode.n != uint8(expected) {
-		t.Errorf("opcode.n = 0x%X; expected 0x%X", opcode.n, expected)
+	if opcode.N != uint8(expected) {
+		t.Errorf("opcode.N = 0x%X; expected 0x%X", opcode.N, expected)
 	}
 
 	expected = 0xCD
-	if opcode.nn != uint8(expected) {
-		t.Errorf("opcode.n = 0x%X; expected 0x%X", opcode.nn, expected)
+	if opcode.NN != uint8(expected) {
+		t.Errorf("opcode.NN = 0x%X; expected 0x%X", opcode.NN, expected)
 	}
 
 	expected = 0xBCD
-	if opcode.nnn != expected {
-		t.Errorf("opcode.n = 0x%X; expected 0x%X", opcode.nnn, expected)
+	if opcode.NNN != expected {
+		t.Errorf("opcode.NNN = 0x%X; expected 0x%X", opcode.NNN, expected)
 	}
 }
