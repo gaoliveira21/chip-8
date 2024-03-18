@@ -47,7 +47,7 @@ Chip-8 browser demo available in the following link:
 
 # References
 
-This is a list of useful resources that I consulted for build this project.
+This is a list of useful resources that I've consulted for build this project.
 
 - Thomas P. Greene: [Cowgod's Chip-8 Technical Reference v1.0](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#2.4)
 
