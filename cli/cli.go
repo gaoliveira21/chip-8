@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gaoliveira21/chip8/cli/debug"
 	"github.com/gaoliveira21/chip8/core"
 )
 
@@ -13,6 +14,8 @@ func main() {
 	flag.Parse()
 
 	romData, err := os.ReadFile(*rom)
+
+	go debug.NewDebugger(romData, *rom)
 
 	if err != nil {
 		log.Fatal(err)
