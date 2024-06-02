@@ -2,11 +2,6 @@
 
 A CHIP-8 Emulator project to put GoLang in practice and learn how an emulator works.
 
-[corax89’s chip8-test-rom](https://github.com/corax89/chip8-test-rom)
-[Timendus' chip-8 test suite](https://github.com/Timendus/chip8-test-suite)
-
-![test_opcode](./cli/assets/test_opcode.png)
-
 **Blinky [Hans Christian Egeberg, 1991]** | **Spacefight 2091 [Carsten Soerensen, 1992]**
 :-------------------------:|:-------------------------:
 <img width="430" alt="blinky" src="./cli/assets/blinky_test.png">  |  <img width="430" alt="spacefight" src="./cli/assets/spacefight_test.png">
@@ -66,3 +61,7 @@ This is a list of useful resources that I've consulted for build this project.
 -  cassianoperin: [CHIP8_GO ](https://github.com/cassianoperin/CHIP8_GO)
 
 - Octo: [Mastering SuperChip](http://johnearnest.github.io/Octo/docs/SuperChip.html)
+
+- corax89: [chip8-test-rom](https://github.com/corax89/chip8-test-rom)
+
+- Timendus: [chip-8 test suite](https://github.com/Timendus/chip8-test-suite)
