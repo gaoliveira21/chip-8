@@ -18,6 +18,8 @@ Chip-8 browser demo available in the following link:
 
 # Keypad Configuration
 
+Chip-8 Keyboard
+
 <img width="430" alt="chip-8 keyboard layout" src="./cli/assets/chip8-keyboard.png">
 
 | Your keyboard | Chip 8 |
