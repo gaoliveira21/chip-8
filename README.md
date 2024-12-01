@@ -12,7 +12,7 @@ A CHIP-8 Emulator project to put GoLang in practice and learn how an emulator wo
 
 # Demo
 
-Chip-8 browser demo available in the following link:
+A Chip-8 browser demo is available in the following link:
 
 [CHIP-8 emulator demo](https://gaoliveira21.github.io/chip-8/)
 
