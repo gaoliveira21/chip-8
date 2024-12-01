@@ -18,35 +18,26 @@ Chip-8 browser demo available in the following link:
 
 # Keypad Configuration
 
-[Your keyboard] --> [Chip 8]
+<img width="430" alt="chip-8 keyboard layout" src="./cli/assets/chip8-keyboard.png">
 
-- 1 --> 1
-- 2 --> 2
-- 3 --> 3
-- 4 --> C
-- Q --> 4
-- W --> 5
-- E --> 6
-- R --> D
-- A --> 7
-- S --> 8
-- D --> 9
-- F --> E
-- Z --> A
-- X --> 0
-- C --> B
-- V --> F
-
-# To Do
-
-- [X] Add beep audio
-- [X] Run in browser
-  - [ ] Audio support
-  - [X] Select ROM
-- [ ] Add configuration file to change color and keypad
-- [ ] Improve unit tests
-- [X] Add SUPER-CHIP support
-- [ ] Add XO-CHIP support
+| Your keyboard | Chip 8 |
+|---------------|--------|
+| 1             | 1      |
+| 2             | 2      |
+| 3             | 3      |
+| 4             | C      |
+| Q             | 4      |
+| W             | 5      |
+| E             | 6      |
+| R             | D      |
+| A             | 7      |
+| S             | 8      |
+| D             | 9      |
+| F             | E      |
+| Z             | A      |
+| X             | 0      |
+| C             | B      |
+| V             | F      |
 
 # References
 
