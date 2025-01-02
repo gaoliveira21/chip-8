@@ -1,11 +1,12 @@
-name: gh-pages-deploy
+name: chip8-deploy
 
 on:
   push:
-    branches: [main]
+    tags:
+      - '*'
 
 jobs:
-  deploy:
+  deploy-wasm:
     runs-on: ubuntu-latest
 
     steps:
@@ -13,7 +14,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.21.x'
+          go-version: '1.23.x'
 
       - name: Install dependencies
         run: go mod download
@@ -21,8 +22,22 @@ jobs:
       - name: Build WASM
         run: GOOS=js GOARCH=wasm go build -o ./web/public/chip8.wasm ./web/web.go
 
+      - name: Build Linux64
+        run: GOOS=linux GOARCH=amd64 go build -o ./bin/linux64_chip8 ./cli/cli.go
+
+      - name: Build Windows64
+        run: GOOS=windows GOARCH=amd64 go build -o ./bin/windows_chip8.exe ./cli/cli.go
+
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./web/public
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        id: create_release
+        with:
+          files: |
+            ./bin/linux64_chip8
+            ./bin/windows_chip8.exe
