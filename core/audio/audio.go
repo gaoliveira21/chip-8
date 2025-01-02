@@ -1,31 +1,31 @@
 package audio
 
 import (
+	"bytes"
+	"embed"
 	"errors"
 	"io"
 	"os"
-	"path"
-	"runtime"
 
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 )
+
+//go:embed beep.mp3
+var fs embed.FS
 
 const sampleRate = 48000
 
 type AudioPlayer = *audio.Player
 
 func readFromFS() (io.Reader, error) {
-	_, b, _, _ := runtime.Caller(0)
-	d := path.Join(path.Dir(b), "..", "..", "cli", "assets", "beep.mp3")
-
-	r, err := os.Open(d)
+	r, err := fs.ReadFile("beep.mp3")
 
 	if err != nil {
 		return nil, err
 	}
 
-	return r, nil
+	return bytes.NewReader(r), nil
 }
 
 func NewAudioPlayer() (AudioPlayer, error) {
